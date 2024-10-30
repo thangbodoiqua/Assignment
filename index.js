@@ -4,16 +4,21 @@ const { engine } = require('express-handlebars');  // Sử dụng cú pháp dest
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
+
 const app = express();
+const PORT = 8000;
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/resources', express.static(path.join(__dirname, 'resources')));
 // Cấu hình Handlebars
-app.engine('handlebars', engine({ defaultLayout: 'main' }));
+app.engine('handlebars', engine({ defaultLayout: 'main', 
+  extname: '.hbs'
+}));
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
-
+console.log(__dirname)
 // // Kết nối cơ sở dữ liệu
 // const db = mysql.createConnection({
 //   host: 'localhost',
@@ -59,7 +64,6 @@ app.get('/signup', (req, res) => {
 //   });
 // });
 
-const PORT = 8000;
 app.listen(PORT, () => {
   var a = 1;
   var b = 2;
