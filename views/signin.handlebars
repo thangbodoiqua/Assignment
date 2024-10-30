@@ -1,16 +1,13 @@
-<h1>Sign In</h1>
-<form action="/signin" method="POST">
-  <label for="email">Email:</label>
-  <input type="text" id="email" name="email" required>
-
-  <label for="password">Password:</label>
-  <input type="password" id="password" name="password" required>
-
-  <button type="submit">Sign In</button>
-</form>
-
-<p>Don't have an account? <a href="/signup">Sign up here</a></p>
-
-{{#if error}}
-  <p style="color: red;">{{error}}</p>
-{{/if}}
+<h2>Inbox</h2>
+<ul class="email-list">
+  <li class="email-item">
+    <p><strong>From:</strong> User B</p>
+    <p><strong>Subject:</strong> Project Update</p>
+    <p><strong>Date:</strong> 2024-10-29</p>
+  </li>
+  <li class="email-item">
+    <p><strong>From:</strong> User C</p>
+    <p><strong>Subject:</strong> Meeting Schedule</p>
+    <p><strong>Date:</strong> 2024-10-28</p>
+  </li>
+</ul>

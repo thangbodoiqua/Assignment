@@ -1,0 +1,100 @@
+/* Đặt cấu hình chung cho ứng dụng */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  /* Container chính của ứng dụng */
+  .app-container {
+    display: flex;
+    flex: 1;
+    min-height: 100vh;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 220px;
+    background-color: #0073e6;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+  
+  .sidebar h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .sidebar nav ul {
+    list-style-type: none;
+    width: 100%;
+  }
+  
+  .sidebar nav ul li {
+    margin: 1rem 0;
+    text-align: center;
+  }
+  
+  .sidebar nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem;
+    display: block;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+  
+  .sidebar nav ul li a:hover {
+    background-color: #005bb5;
+  }
+  
+  .signout-link {
+    color: #ffd700; /* Màu vàng cho liên kết đăng xuất */
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: #fff;
+  }
+  
+  /* Footer */
+  .footer {
+    background-color: #0073e6;
+    color: #fff;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  .email-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .email-item {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+  }
+  
+  .email-item:hover {
+    background-color: #f1f1f1;
+  }
