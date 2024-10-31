@@ -1,0 +1,12 @@
+<!-- views/emailDetail.hbs -->
+<h2>Email Detail</h2>
+<div>
+    <p><strong>From:</strong> {{email.sender}}</p>
+    <p><strong>To:</strong> {{email.recipient}}</p>
+    <p><strong>Subject:</strong> {{email.subject}}</p>
+    <p><strong>Body:</strong></p>
+    <p>{{email.body}}</p>
+    {{#if email.attachment}}
+    <p><a href="{{email.attachment}}" download>Download Attachment</a></p>
+    {{/if}}
+</div>

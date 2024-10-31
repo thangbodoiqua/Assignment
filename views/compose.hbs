@@ -1,0 +1,25 @@
+<!-- views/compose.hbs -->
+<h2>Compose Email</h2>
+<form action="/send" method="POST" enctype="multipart/form-data">
+    <div>
+        <label for="recipient">Recipient:</label>
+        <select id="recipient" name="recipient" required>
+            {{#each users}}
+            <option value="{{this.id}}">{{this.fullName}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <div>
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject">
+    </div>
+    <div>
+        <label for="body">Body:</label>
+        <textarea id="body" name="body"></textarea>
+    </div>
+    <div>
+        <label for="attachment">Attachment:</label>
+        <input type="file" id="attachment" name="attachment">
+    </div>
+    <button type="submit">Send</button>
+</form>

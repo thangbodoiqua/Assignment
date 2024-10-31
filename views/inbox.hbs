@@ -1,0 +1,12 @@
+<!-- views/inbox.hbs -->
+<h2>Inbox</h2>
+<ul class="email-list">
+    {{#each emails}}
+        <li>
+            <a href="/email/{{this.id}}">
+                <strong>{{this.sender}}</strong> - {{this.subject}} - {{this.receivedAt}}
+            </a>
+        </li>
+    {{/each}}
+</ul>
+<a href="/compose">Compose New Email</a>

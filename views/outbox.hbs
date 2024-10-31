@@ -1,0 +1,12 @@
+<!-- views/outbox.hbs -->
+<h2>Outbox</h2>
+<ul class="email-list">
+    {{#each emails}}
+        <li>
+            <a href="/email/{{this.id}}">
+                <strong>{{this.recipient}}</strong> - {{this.subject}} - {{this.sentAt}}
+            </a>
+        </li>
+    {{/each}}
+</ul>
+<a href="/compose">Compose New Email</a>
