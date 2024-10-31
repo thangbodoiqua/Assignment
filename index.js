@@ -8,17 +8,17 @@ const path = require('path');
 const app = express();
 const PORT = 8000;
 
-app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/resources', express.static(path.join(__dirname, 'resources')));
+app.use(express.urlencoded({ extended: true }));
+
 // Cấu hình Handlebars
-app.engine('handlebars', engine({ defaultLayout: 'main', 
+app.engine('hbs', engine({ defaultLayout: 'main', 
   extname: '.hbs'
 }));
-app.set('view engine', 'handlebars');
+app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
-console.log(__dirname)
+app.use('/resources', express.static(path.join(__dirname, 'resources')));
+
 // // Kết nối cơ sở dữ liệu
 // const db = mysql.createConnection({
 //   host: 'localhost',
