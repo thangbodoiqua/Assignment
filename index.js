@@ -8,7 +8,6 @@ const mysql = require('mysql2/promise');
 const app = express();
 const PORT = 8000;
 
-// Cấu hình Handlebars
 app.engine('hbs', engine({ 
   extname: '.hbs', 
   defaultLayout: 'main', 
@@ -21,13 +20,10 @@ app.engine('hbs', engine({
   }
 }));
 app.set('view engine', 'hbs');
-
-// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'resources')));
 
-// Kết nối MySQL
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'wpr',
@@ -36,8 +32,7 @@ const pool = mysql.createPool({
   port: 3306
 });
 
-// Routes
-// Trang đăng nhập
+// 
 app.get('/', (req, res) => {
   if (req.cookies.loggedIn) {
     return res.redirect('/inbox'); // Nếu đã đăng nhập, chuyển hướng đến inbox
@@ -45,7 +40,7 @@ app.get('/', (req, res) => {
   res.render('signin'); // Nếu chưa đăng nhập, hiển thị trang đăng nhập
 });
 
-// Xử lý đăng nhập
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -55,8 +50,8 @@ app.post('/login', async (req, res) => {
       const user = rows[0];
       if (user.password === password) {
         // Thiết lập cookie khi đăng nhập thành công
-        res.cookie('loggedIn', true, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // Cookie tồn tại trong 1 ngày
-        res.cookie('userId', user.id, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // Lưu userId trong cookie
+        res.cookie('loggedIn', true, { httpOnly: true, maxAge: 60 * 1000 }); // Cookie tồn tại trong 1 ngày
+        res.cookie('userId', user.id, { httpOnly: true, maxAge: 60 * 1000 }); // Lưu userId trong cookie
         res.redirect('/inbox');
       } else {
         res.render('signin', { errorMessage: 'Sai tài khoản hoặc mật khẩu!' });
@@ -138,7 +133,7 @@ app.post('/login', async (req, res) => {
 // Trang hộp thư đến (chỉ khi đã đăng nhập)
 app.get('/inbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
-    return res.status(403).render('access-denied'); // Hiển thị trang 403 nếu chưa đăng nhập
+    return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
   }
 
   const page = parseInt(req.query.page) || 1; // Lấy số trang từ query string
@@ -164,13 +159,13 @@ app.get('/inbox', async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Có lỗi xảy ra, vui lòng thử lại!');
+    res.status(500).send('There is an error, please try again!');
   }
 });
 //compose
 app.get('/compose', async (req, res) => {
   if (!req.cookies.loggedIn) {
-    return res.status(403).render('access-denied'); // Chuyển đến trang access denied
+    return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
   }
 
   // Lấy danh sách người dùng trừ người đang đăng nhập
@@ -213,7 +208,7 @@ app.get('/emain_detail', (req, res) => {
 /// Trang Outbox (chỉ khi đã đăng nhập)
 app.get('/outbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
-    return res.status(403).render('access-denied'); // Hiển thị trang 403 nếu chưa đăng nhập
+    return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
   }
 
   const page = parseInt(req.query.page) || 1; // Lấy số trang từ query string
