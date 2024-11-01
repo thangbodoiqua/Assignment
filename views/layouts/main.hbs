@@ -7,15 +7,13 @@
     <title>{{title}}</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/reset.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
 </head>
 <body>
-        {{> header}}
-        <div class="container">
-            {{{body}}}
-        </div>
-        {{> footer}}
-
+    {{> header loggedIn=loggedIn userFullname=userFullname}} <!-- Truyền loggedIn và userFullname vào header -->
+    <div class="container">
+        {{{body}}}
+    </div>
+    {{> footer}}
 </body>
 </html>

@@ -1,3 +1,4 @@
+// dbsetup.js
 const mysql = require('mysql2/promise');
 
 async function setupDatabase() {
@@ -80,7 +81,7 @@ async function addUser(fullname, email, password) {
   }
 }
 
-// Gọi hàm này để thêm người dùng mới (có thể bỏ qua nếu không cần)
-addUser('User Four', 'd@d.com', '123');
-// Thiết lập cơ sở dữ liệu
-setupDatabase().catch((error) => console.error(error));
+// Thiết lập cơ sở dữ liệu trước khi thêm người dùng mới
+setupDatabase().then(() => {
+  return addUser('User Four', 'd@d.com', '123');
+}).catch((error) => console.error(error));
