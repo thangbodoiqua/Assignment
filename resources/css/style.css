@@ -11,10 +11,21 @@ body {
     min-height: 100vh;
     margin: 0;
 }
+
 .container {
     flex: 1;
     padding: 20px;
-    padding-top: 60px; /* Điều chỉnh tùy theo chiều cao thực tế của header */
-    padding-bottom: 40px; /* Điều chỉnh tùy theo chiều cao thực tế của footer */
-
+    padding-top: 90px; /* Khoảng trống phù hợp với chiều cao của header */
+    padding-bottom: 60px; /* Khoảng trống phù hợp cho footer */
 }
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-bottom: 1em;
+  }
+  .success-message {
+    color: green;
+    font-size: 0.9em;
+    margin-bottom: 1em;
+  }
