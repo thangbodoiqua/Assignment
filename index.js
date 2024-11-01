@@ -209,9 +209,41 @@ app.get('/emain_detail', (req, res) => {
   res.render('emain_detail', { errorMessage: 'Wrong email or password!' });
 
 });
-app.get('/outbox', (req, res) => {
-  res.render('outbox', { errorMessage: 'Wrong email or password!' });
+//outbox 
+/// Trang Outbox (chỉ khi đã đăng nhập)
+app.get('/outbox', async (req, res) => {
+  if (!req.cookies.loggedIn) {
+    return res.status(403).render('access-denied'); // Hiển thị trang 403 nếu chưa đăng nhập
+  }
 
+  const page = parseInt(req.query.page) || 1; // Lấy số trang từ query string
+  const limit = 5; // Số email hiển thị mỗi trang
+  const offset = (page - 1) * limit; // Tính offset
+
+  try {
+    // Lấy danh sách email đã gửi
+    const [emails] = await pool.query('SELECT e.*, u.fullname AS recipient FROM emails e JOIN users u ON e.receiver_id = u.id WHERE e.sender_id = ? ORDER BY e.created_at DESC LIMIT ? OFFSET ?', [req.cookies.userId, limit, offset]);
+    
+    // Lấy tổng số email đã gửi để phân trang
+    const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE sender_id = ?', [req.cookies.userId]);
+    const totalPages = Math.ceil(totalEmails[0].count / limit); // Tính tổng số trang
+    const prevPage = page > 1 ? page - 1 : null; // Trang trước
+    const nextPage = page < totalPages ? page + 1 : null; // Trang sau
+
+    const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+
+    res.render('outbox', {
+      title: 'Outbox',
+      emails,
+      loggedIn: req.cookies.loggedIn,
+      userFullname: user[0].fullname,
+      prevPage,
+      nextPage
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Có lỗi xảy ra, vui lòng thử lại!');
+  }
 });
 // Đăng xuất
 app.get('/logout', (req, res) => {

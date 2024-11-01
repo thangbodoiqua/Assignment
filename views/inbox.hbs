@@ -1,18 +1,25 @@
 <!-- views/inbox.hbs -->
 <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f7fa; /* Nền trang nhẹ nhàng */
+    }
+
     .inbox-container {
-        margin-top: 80px;
-        display: flex; /* Sử dụng flexbox để tạo layout */
+        display: flex; /* Sử dụng flexbox để bố trí */
+        margin-top: 80px; 
     }
 
     .sidebar {
-        width: 200px; /* Chiều rộng menu bên trái */
+        width: 250px; /* Chiều rộng menu bên trái */
         padding: 20px;
-        background-color: #f8f9fa; /* Màu nền cho menu */
-        border-right: 1px solid #ddd;
+        background-color: #007bff; /* Màu nền cho menu */
+        color: white; /* Màu chữ */
+        border-right: 1px solid #0056b3; /* Đường viền bên phải */
         height: calc(100vh - 80px); /* Chiều cao menu */
         position: sticky; /* Menu luôn nằm bên trái khi cuộn */
         top: 80px; /* Căn chỉnh với header */
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Đổ bóng cho menu */
     }
 
     .sidebar a {
@@ -20,17 +27,26 @@
         margin: 10px 0;
         padding: 10px;
         text-decoration: none;
-        color: #007bff;
-        transition: background-color 0.3s;
+        color: white; /* Màu chữ liên kết */
+        border-radius: 4px; /* Bo góc cho liên kết */
+        transition: background-color 0.3s, color 0.3s; /* Hiệu ứng chuyển màu */
     }
 
     .sidebar a:hover {
-        background-color: #e9ecef; /* Hiệu ứng hover cho menu */
+        background-color: #0056b3; /* Màu nền khi hover */
+        color: #e0e0e0; /* Màu chữ khi hover */
     }
 
     .inbox-content {
         flex: 1; /* Chiếm không gian còn lại của trang */
-        padding: 20px;
+        padding: 20px; /* Khoảng cách nội dung */
+        background-color: #ffffff; /* Nền trắng cho nội dung */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng cho nội dung */
+        border-radius: 8px; /* Bo góc cho nội dung */
+    }
+
+    h2 {
+        color: #333; /* Màu tiêu đề */
     }
 
     .email-list {
