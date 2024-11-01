@@ -10,6 +10,7 @@ async function setupDatabase() {
 
   const dbName = 'wpr2201040168';
 
+  // Tạo database nếu chưa tồn tại
   await connection.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
   await connection.query(`USE ${dbName}`);
 
@@ -53,11 +54,33 @@ async function setupDatabase() {
     (2, 1, 'Reply', 'Thanks for the email, User One!'),
     (1, 3, 'Greetings', 'Hello User Three! How are you?'),
     (3, 1, 'Re: Greetings', 'I am fine, thank you, User One!')
-    -- Thêm các email khác theo yêu cầu
   `);
 
   console.log("Database setup complete.");
   await connection.end();
 }
 
+// Thêm hàm tạo người dùng mới
+async function addUser(fullname, email, password) {
+  const connection = await mysql.createConnection({
+    host: 'localhost',
+    user: 'wpr',
+    password: 'fit2024',
+    database: 'wpr2201040168',
+    port: 3306
+  });
+
+  try {
+    await connection.query(`INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)`, [fullname, email, password]);
+    console.log('User added successfully!');
+  } catch (error) {
+    console.error('Error adding user:', error.message);
+  } finally {
+    await connection.end();
+  }
+}
+
+// Gọi hàm này để thêm người dùng mới (có thể bỏ qua nếu không cần)
+addUser('User Four', 'd@d.com', '123');
+// Thiết lập cơ sở dữ liệu
 setupDatabase().catch((error) => console.error(error));
