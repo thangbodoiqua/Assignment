@@ -10,9 +10,15 @@ const PORT = 8000;
 
 // Cấu hình Handlebars
 app.engine('hbs', engine({ 
-    extname: '.hbs', 
-    defaultLayout: 'main', 
-    layoutsDir: path.join(__dirname, 'views', 'layouts') 
+  extname: '.hbs', 
+  defaultLayout: 'main', 
+  layoutsDir: path.join(__dirname, 'views', 'layouts'),
+  helpers: {
+      formatDate: (date) => {
+          const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+          return new Date(date).toLocaleDateString('en-US', options);
+      }
+  }
 }));
 app.set('view engine', 'hbs');
 
@@ -132,20 +138,48 @@ app.post('/login', async (req, res) => {
 // Trang hộp thư đến (chỉ khi đã đăng nhập)
 app.get('/inbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
-    return res.redirect('/');
+    return res.status(403).render('access-denied'); // Hiển thị trang 403 nếu chưa đăng nhập
   }
 
-  const [emails] = await pool.query('SELECT * FROM emails WHERE receiver_id = ? ORDER BY created_at DESC', [req.cookies.userId]);
-  const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+  const page = parseInt(req.query.page) || 1; // Lấy số trang từ query string
+  const limit = 5; // Số email hiển thị mỗi trang
+  const offset = (page - 1) * limit; // Tính offset
 
-  res.render('inbox', {
-    title: 'Inbox', // Thêm tiêu đề cho trang
-    emails,
-    loggedIn: req.cookies.loggedIn,
-    userFullname: user[0].fullname,
-  });
+  try {
+    const [emails] = await pool.query('SELECT * FROM emails WHERE receiver_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [req.cookies.userId, limit, offset]);
+    const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE receiver_id = ?', [req.cookies.userId]);
+    const totalPages = Math.ceil(totalEmails[0].count / limit); // Tính tổng số trang
+    const prevPage = page > 1 ? page - 1 : null; // Trang trước
+    const nextPage = page < totalPages ? page + 1 : null; // Trang sau
+
+    const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+
+    res.render('inbox', {
+      title: 'Inbox',
+      emails,
+      loggedIn: req.cookies.loggedIn,
+      userFullname: user[0].fullname,
+      prevPage,
+      nextPage
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Có lỗi xảy ra, vui lòng thử lại!');
+  }
 });
+//compose
+app.get('/compose', (req, res) => {
+  res.render('compose', { errorMessage: 'Wrong email or password!' });
 
+});
+app.get('/emain_detail', (req, res) => {
+  res.render('emain_detail', { errorMessage: 'Wrong email or password!' });
+
+});
+app.get('/outbox', (req, res) => {
+  res.render('outbox', { errorMessage: 'Wrong email or password!' });
+
+});
 // Đăng xuất
 app.get('/logout', (req, res) => {
   res.clearCookie('loggedIn');

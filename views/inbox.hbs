@@ -1,12 +1,115 @@
 <!-- views/inbox.hbs -->
-<h2>Inbox</h2>
-<ul class="email-list">
-    {{#each emails}}
-        <li>
-            <a href="/email/{{this.id}}">
-                <strong>{{this.sender}}</strong> - {{this.subject}} - {{this.receivedAt}}
-            </a>
-        </li>
-    {{/each}}
-</ul>
-<a href="/compose">Compose New Email</a>
+<style>
+    .inbox-container {
+        margin-top: 80px;
+        display: flex; /* Sử dụng flexbox để tạo layout */
+    }
+
+    .sidebar {
+        width: 200px; /* Chiều rộng menu bên trái */
+        padding: 20px;
+        background-color: #f8f9fa; /* Màu nền cho menu */
+        border-right: 1px solid #ddd;
+        height: calc(100vh - 80px); /* Chiều cao menu */
+        position: sticky; /* Menu luôn nằm bên trái khi cuộn */
+        top: 80px; /* Căn chỉnh với header */
+    }
+
+    .sidebar a {
+        display: block;
+        margin: 10px 0;
+        padding: 10px;
+        text-decoration: none;
+        color: #007bff;
+        transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+        background-color: #e9ecef; /* Hiệu ứng hover cho menu */
+    }
+
+    .inbox-content {
+        flex: 1; /* Chiếm không gian còn lại của trang */
+        padding: 20px;
+    }
+
+    .email-list {
+        margin: 20px 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .email-item {
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        background-color: #ffffff;
+        transition: background-color 0.3s ease;
+    }
+
+    .email-item:hover {
+        cursor: pointer;
+        background-color: #f1f1f1; /* Hiệu ứng hover */
+    }
+
+    .email-item h3 {
+        margin: 0;
+        color: #007bff; /* Màu tiêu đề email */
+    }
+
+    .email-item p {
+        margin: 5px 0;
+        color: #555; /* Màu nội dung email */
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+    .pagination a {
+        margin: 0 5px;
+        padding: 10px 15px;
+        border: 1px solid #007bff;
+        color: #007bff;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .pagination a:hover {
+        background-color: #007bff;
+        color: white; /* Màu chữ khi hover */
+    }
+</style>
+
+<div class="inbox-container">
+    <div class="sidebar">
+        <a href="/compose">Compose</a>
+        <a href="/inbox">Inbox</a>
+        <a href="/outbox">Outbox</a>
+    </div>
+    <div class="inbox-content">
+        <h2>Inbox</h2>
+        <ul class="email-list">
+            {{#each emails}}
+            <li class="email-item">
+                <a href="/email/{{this.id}}"><!-- Link đến trang chi tiết email -->
+                    <h3>{{this.sender}} - {{this.subject}}</h3>
+                    <p><small>Received on: {{formatDate this.created_at}}</small></p>
+                </a>
+            </li>
+            {{/each}}
+        </ul>
+        <div class="pagination">
+            {{#if prevPage}}
+            <a href="/inbox?page={{prevPage}}">Previous</a>
+            {{/if}}
+            {{#if nextPage}}
+            <a href="/inbox?page={{nextPage}}">Next</a>
+            {{/if}}
+        </div>
+    </div>
+</div>
