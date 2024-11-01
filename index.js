@@ -33,7 +33,35 @@ const pool = mysql.createPool({
 // Routes
 // Trang đăng nhập
 app.get('/', (req, res) => {
-  res.render('signin');
+  if (req.cookies.loggedIn) {
+    return res.redirect('/inbox'); // Nếu đã đăng nhập, chuyển hướng đến inbox
+  }
+  res.render('signin'); // Nếu chưa đăng nhập, hiển thị trang đăng nhập
+});
+
+// Xử lý đăng nhập
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    if (rows.length > 0) {
+      const user = rows[0];
+      if (user.password === password) {
+        // Thiết lập cookie khi đăng nhập thành công
+        res.cookie('loggedIn', true, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // Cookie tồn tại trong 1 ngày
+        res.cookie('userId', user.id, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // Lưu userId trong cookie
+        res.redirect('/inbox');
+      } else {
+        res.render('signin', { errorMessage: 'Sai tài khoản hoặc mật khẩu!' });
+      }
+    } else {
+      res.render('signin', { errorMessage: 'Sai tài khoản hoặc mật khẩu!' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.render('signin', { errorMessage: 'Có lỗi xảy ra, vui lòng thử lại!' });
+  }
 });
 
 // Trang đăng ký
@@ -45,17 +73,36 @@ app.get('/signup', (req, res) => {
 app.post('/register', async (req, res) => {
   const { fullname, email, password, confirmPassword } = req.body;
 
-  if (!fullname || !email || !password || password !== confirmPassword) {
-    return res.render('signup', { errorMessage: 'Thông tin không hợp lệ. Vui lòng kiểm tra lại.' });
+  // Kiểm tra các điều kiện nhập liệu
+  if (!fullname || !email || !password || !confirmPassword) {
+      return res.json({ success: false, message: 'Please fill in all fields.' });
+  }
+
+  if (password.length < 6) {
+      return res.json({ success: false, message: 'Password must be at least 6 characters long.' });
+  }
+
+  if (password !== confirmPassword) {
+      return res.json({ success: false, message: 'Password and confirm password do not match.' });
   }
 
   try {
-    await pool.query('INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)', [fullname, email, password]);
-    res.render('signin', { successMessage: 'Đăng ký thành công! Vui lòng đăng nhập.' });
+      // Kiểm tra xem email đã được sử dụng chưa
+      const [existingUser] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+      if (existingUser.length > 0) {
+          return res.json({ success: false, message: 'Email is already in use!' });
+      }
+
+      // Nếu tất cả điều kiện đều hợp lệ, thực hiện đăng ký
+      await pool.query('INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)', [fullname, email, password]);
+      return res.json({ success: true, message: 'Registration successful! Please sign in.' });
   } catch (error) {
-    console.error(error);
-    res.render('signup', { errorMessage: 'Email đã được sử dụng!' });
+      console.error(error);
+      return res.json({ success: false, message: 'An error occurred, please try again!' });
   }
+});
+app.get('/signup-success', (req, res) => {
+  res.render('signup', { successMessage: 'Registration successful! Please sign in.' });
 });
 
 // Xử lý đăng nhập
@@ -71,14 +118,14 @@ app.post('/login', async (req, res) => {
         res.cookie('userId', user.id, { httpOnly: true }); // Lưu userId trong cookie
         res.redirect('/inbox');
       } else {
-        res.render('signin', { errorMessage: 'Sai tài khoản hoặc mật khẩu!' });
+        res.render('signin', { errorMessage: 'Wrong email or password!' });
       }
     } else {
-      res.render('signin', { errorMessage: 'Sai tài khoản hoặc mật khẩu!' });
+      res.render('signin', { errorMessage: 'Wrong email or password!' });
     }
   } catch (error) {
     console.error(error);
-    res.render('signin', { errorMessage: 'Có lỗi xảy ra, vui lòng thử lại!' });
+    res.render('signin', { errorMessage: 'There is an error, please try again' });
   }
 });
 

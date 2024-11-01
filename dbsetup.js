@@ -44,8 +44,8 @@ async function setupDatabase() {
   await connection.query(`
     INSERT IGNORE INTO users (fullname, email, password) VALUES 
     ('User One', 'a@a.com', '123'),
-    ('User Two', 'b@b.com', '123'),
-    ('User Three', 'c@c.com', '123')
+    ('Thangbodoiqua', 'dluy2406@gmail.com', '123'),
+    ('Nguyen Dinh Thang', 'dinhthang2k04@gmail.com', '123')
   `);
 
   // Khởi tạo dữ liệu email mẫu
