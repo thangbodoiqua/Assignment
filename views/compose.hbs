@@ -1,25 +1,61 @@
 <!-- views/compose.hbs -->
-<h2>Compose Email</h2>
-<form action="/send" method="POST" enctype="multipart/form-data">
-    <div>
-        <label for="recipient">Recipient:</label>
-        <select id="recipient" name="recipient" required>
-            {{#each users}}
-            <option value="{{this.id}}">{{this.fullName}}</option>
-            {{/each}}
-        </select>
-    </div>
-    <div>
-        <label for="subject">Subject:</label>
-        <input type="text" id="subject" name="subject">
-    </div>
-    <div>
-        <label for="body">Body:</label>
-        <textarea id="body" name="body"></textarea>
-    </div>
-    <div>
-        <label for="attachment">Attachment:</label>
-        <input type="file" id="attachment" name="attachment">
-    </div>
-    <button type="submit">Send</button>
-</form>
+<style>
+    .compose-container {
+        margin-top: 80px; 
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .error-message {
+        color: red;
+        margin-top: 10px;
+    }
+
+    .success-message {
+        color: green;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="compose-container">
+    <h2>Compose Email</h2>
+    {{#if errorMessage}}
+        <div class="error-message">{{errorMessage}}</div>
+    {{/if}}
+    {{#if successMessage}}
+        <div class="success-message">{{successMessage}}</div>
+    {{/if}}
+    <form action="/compose" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="recipient">Recipient:</label>
+            <select id="recipient" name="recipient" class="form-control" required>
+                <option value="">Select a recipient</option>
+                {{#each users}}
+                    <option value="{{this.id}}">{{this.fullname}} ({{this.email}})</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" class="form-control" placeholder="(no subject)">
+        </div>
+        <div class="form-group">
+            <label for="body">Email Body:</label>
+            <textarea id="body" name="body" class="form-control" rows="10" placeholder="Type your message here..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="attachment">Attachment:</label>
+            <input type="file" id="attachment" name="attachment" class="form-control">
+        </div>
+        <button type="submit" class="form-control">Send</button>
+    </form>
+</div>

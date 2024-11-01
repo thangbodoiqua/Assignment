@@ -168,9 +168,42 @@ app.get('/inbox', async (req, res) => {
   }
 });
 //compose
-app.get('/compose', (req, res) => {
-  res.render('compose', { errorMessage: 'Wrong email or password!' });
+app.get('/compose', async (req, res) => {
+  if (!req.cookies.loggedIn) {
+    return res.status(403).render('access-denied'); // Chuyển đến trang access denied
+  }
 
+  // Lấy danh sách người dùng trừ người đang đăng nhập
+  const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
+  const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]); // Lấy tên người dùng đang đăng nhập
+
+  res.render('compose', {
+    users,
+    loggedIn: req.cookies.loggedIn,
+    userFullname: user[0].fullname, // Truyền tên người dùng vào view
+  });
+});
+
+// Xử lý gửi email
+app.post('/compose', async (req, res) => {
+  const { recipient, subject, body } = req.body;
+
+  // Kiểm tra xem người nhận đã được chọn chưa
+  if (!recipient) {
+    return res.render('compose', { errorMessage: 'Please select a recipient.' });
+  }
+
+  try {
+    // Thêm email vào cơ sở dữ liệu
+    await pool.query('INSERT INTO emails (sender_id, receiver_id, subject, body) VALUES (?, ?, ?, ?)', [req.cookies.userId, recipient, subject || null, body || null]);
+
+    // Nếu có file đính kèm, xử lý upload file ở đây (điều này cần sử dụng multer hoặc thư viện khác)
+
+    res.render('compose', { successMessage: 'Email sent successfully!', users: await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]) });
+  } catch (error) {
+    console.error(error);
+    res.render('compose', { errorMessage: 'An error occurred while sending the email. Please try again.', users: await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]) });
+  }
 });
 app.get('/emain_detail', (req, res) => {
   res.render('emain_detail', { errorMessage: 'Wrong email or password!' });
