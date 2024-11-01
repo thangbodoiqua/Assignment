@@ -2,7 +2,6 @@
 const express = require('express');
 const { engine } = require('express-handlebars');
 const cookieParser = require('cookie-parser');
-const path = require('path');
 const mysql = require('mysql2/promise');
 
 const app = express();
@@ -11,7 +10,7 @@ const PORT = 8000;
 app.engine('hbs', engine({ 
   extname: '.hbs', 
   defaultLayout: 'main', 
-  layoutsDir: path.join(__dirname, 'views', 'layouts'),
+  layoutsDir: 'views/layouts',
   helpers: {
       formatDate: (date) => {
           const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -22,7 +21,7 @@ app.engine('hbs', engine({
 app.set('view engine', 'hbs');
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'resources')));
+app.use(express.static('resources'));
 
 const pool = mysql.createPool({
   host: 'localhost',
@@ -76,36 +75,38 @@ app.post('/register', async (req, res) => {
 
   // Kiểm tra các điều kiện nhập liệu
   if (!fullname || !email || !password || !confirmPassword) {
-      return res.json({ success: false, message: 'Please fill in all fields.' });
+    return res.json({ success: false, message: 'Please fill in all fields.' });
   }
 
   if (password.length < 6) {
-      return res.json({ success: false, message: 'Password must be at least 6 characters long.' });
+    return res.json({ success: false, message: 'Password must be at least 6 characters long.' });
   }
 
   if (password !== confirmPassword) {
-      return res.json({ success: false, message: 'Password and confirm password do not match.' });
+    return res.json({ success: false, message: 'Password and confirm password do not match.' });
   }
 
   try {
-      // Kiểm tra xem email đã được sử dụng chưa
-      const [existingUser] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-      if (existingUser.length > 0) {
-          return res.json({ success: false, message: 'Email is already in use!' });
-      }
+    // Kiểm tra xem email đã được sử dụng chưa
+    const [existingUser] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    if (existingUser.length > 0) {
+      return res.json({ success: false, message: 'Email is already in use!' });
+    }
 
-      // Nếu tất cả điều kiện đều hợp lệ, thực hiện đăng ký
-      await pool.query('INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)', [fullname, email, password]);
-      return res.json({ success: true, message: 'Registration successful! Please sign in.' });
+    // Nếu tất cả điều kiện đều hợp lệ, thực hiện đăng ký
+    await pool.query('INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)', [fullname, email, password]);
+
+    // Chuyển hướng đến trang thành công hoặc thông báo thành công
+    return res.json({ success: true, message: 'Registration successful!' });
+    
   } catch (error) {
-      console.error(error);
-      return res.json({ success: false, message: 'An error occurred, please try again!' });
+    console.error(error);
+    return res.json({ success: false, message: 'An error occurred, please try again!' });
   }
 });
 app.get('/signup-success', (req, res) => {
-  res.render('signup', { successMessage: 'Registration successful! Please sign in.' });
+  res.render('signin', { successMessage: 'Registration successful! Please sign in.' });
 });
-
 // Xử lý đăng nhập
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;

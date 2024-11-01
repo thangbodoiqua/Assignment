@@ -1,6 +1,4 @@
-<!-- views/partials/header.hbs -->
 <style>
-    /* Style cho header */
     .main-header {
         width: 100%;
         display: flex;
@@ -23,7 +21,7 @@
     }
 
     .main-header .logo a {
-        color: #FFD700; /* Màu vàng nổi bật cho logo */
+        color: #FFD700; 
         font-size: 1.8em;
         font-weight: bold;
         text-transform: uppercase;
@@ -42,8 +40,8 @@
     }
 
     .main-header .header-actions .btn:hover {
-        background-color: #FFC107; /* Thay đổi màu khi hover */
-        transform: scale(1.1); /* Hiệu ứng phóng to nhẹ */
+        background-color: #FFC107; 
+        transform: scale(1.1); 
     }
 </style>
 <header class="main-header">
@@ -51,9 +49,9 @@
         <a href="/">My Email App</a>
     </div>
     <div class="header-actions">
-        {{#if loggedIn}} <!-- Kiểm tra trạng thái đăng nhập -->
-            <span>Welcome, {{userFullname}}!</span> <!-- Hiển thị tên người dùng -->
-            <a href="/logout" class="btn">Log Out</a> <!-- Nút Log Out -->
+        {{#if loggedIn}} 
+            <span>Welcome, {{userFullname}}!</span> 
+            <a href="/logout" class="btn">Log Out</a> 
         {{else}}
             <a href="/" class="btn">Sign In</a>
             <a href="/signup" class="btn">Sign Up</a> <!-- Nút Sign In và Sign Up -->

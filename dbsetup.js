@@ -1,15 +1,12 @@
-// dbsetup.js
-const mysql = require('mysql2/promise');
-
 async function setupDatabase() {
   const connection = await mysql.createConnection({
-    host: 'localhost',
-    user: 'wpr',
-    password: 'fit2024',
-    port: 3306
+    host: process.env.DB_HOST, // Sử dụng biến môi trường
+    user: process.env.DB_USER, // Sử dụng biến môi trường
+    password: process.env.DB_PASSWORD, // Sử dụng biến môi trường
+    port: process.env.DB_PORT // Sử dụng biến môi trường
   });
 
-  const dbName = 'wpr2201040168';
+  const dbName = process.env.DB_NAME; // Sử dụng biến môi trường
 
   // Tạo database nếu chưa tồn tại
   await connection.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
@@ -61,27 +58,7 @@ async function setupDatabase() {
   await connection.end();
 }
 
-// Thêm hàm tạo người dùng mới
-async function addUser(fullname, email, password) {
-  const connection = await mysql.createConnection({
-    host: 'localhost',
-    user: 'wpr',
-    password: 'fit2024',
-    database: 'wpr2201040168',
-    port: 3306
-  });
-
-  try {
-    await connection.query(`INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)`, [fullname, email, password]);
-    console.log('User added successfully!');
-  } catch (error) {
-    console.error('Error adding user:', error.message);
-  } finally {
-    await connection.end();
-  }
-}
-
-// Thiết lập cơ sở dữ liệu trước khi thêm người dùng mới
+// Chỉ chạy hàm setupDatabase và in ra thông báo
 setupDatabase().then(() => {
-  return addUser('User Four', 'd@d.com', '123');
-}).catch((error) => console.error(error));
+  console.log("Setup completed successfully!");
+}).catch((error) => console.error("Error setting up database:", error));
