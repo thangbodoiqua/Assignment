@@ -1,5 +1,6 @@
+// <!-- dbsetup.js -->// 
 const mysql = require('mysql2/promise');
-require('dotenv').config(); // Sử dụng dotenv
+require('dotenv').config(); 
 
 async function setupDatabase() {
     const connection = await mysql.createConnection({
@@ -44,11 +45,18 @@ async function setupDatabase() {
         ('Nguyen Dinh Thang', 'dinhthang2k04@gmail.com', '123')
     `);
 
-    // Lấy ID và fullname của người dùng vừa chèn
     const [users] = await connection.query('SELECT id, fullname FROM users');
 
-    // Khởi tạo dữ liệu email mẫu với định dạng mới
     const emails = [
+        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
+        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
+        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
+        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
+        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
+        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
+        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
+        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
+        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
         { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
         { sender_id: users[1].id, receiver_id: users[0].id, subject: `reply from ${users[1].fullname}`, body: `to answer ${users[0].fullname}` },
         { sender_id: users[0].id, receiver_id: users[2].id, subject: `from ${users[0].fullname}`, body: `to ${users[2].fullname}` },

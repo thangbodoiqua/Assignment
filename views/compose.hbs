@@ -108,7 +108,7 @@
         {{#if successMessage}}
             <div class="success-message">{{successMessage}}</div>
         {{/if}}
-        <form action="/compose" method="POST" enctype="multipart/form-data">
+        <form action="/compose" method="POST">
             <div class="form-group">
                 <label for="recipient">Recipient:</label>
                 <select id="recipient" name="recipient" class="form-control" required>
@@ -125,10 +125,6 @@
             <div class="form-group">
                 <label for="body">Email Body:</label>
                 <textarea id="body" name="body" class="form-control" rows="10" placeholder="Type your message here..."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="attachment">Attachment:</label>
-                <input type="file" id="attachment" name="attachment" class="form-control">
             </div>
             <button type="submit">Send</button>
         </form>

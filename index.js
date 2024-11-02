@@ -1,3 +1,5 @@
+// <!-- index.js -->// 
+//Cấu hình file
 
 const express = require('express');
 const { engine } = require('express-handlebars');
@@ -13,14 +15,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static('resources'));
 
+
 app.engine('hbs', engine({ 
   extname: '.hbs', 
   defaultLayout: 'main', 
   layoutsDir: 'views/layouts',
   helpers: {
       formatDate: (date) => {
-          const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-          return new Date(date).toLocaleDateString('en-US', options);
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        return new Date(date).toLocaleDateString('en-US', options);
       }
   }
 }));
@@ -30,16 +33,19 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
-  database: process.env.DB_NAME // Thêm dòng này để chỉ định cơ sở dữ liệu
+  database: process.env.DB_NAME
 });
+/// Kết thúc cấu hình
 
- 
+
+//Trang đăng nhập
 app.get('/', (req, res) => {
   if (req.cookies.loggedIn) {
-    return res.redirect('/inbox'); // Nếu đã đăng nhập, chuyển hướng đến inbox
+    return res.redirect('/inbox'); 
   }
-  res.render('signin'); // Nếu chưa đăng nhập, hiển thị trang đăng nhập
+  res.render('signin');
 });
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -62,6 +68,8 @@ app.post('/login', async (req, res) => {
     res.render('signin', { errorMessage: 'There is an error, please try again' });
   }
 });
+//Kết thúc trang đăng nhập
+
 
 
 // Trang đăng ký
@@ -105,12 +113,12 @@ app.post('/register', async (req, res) => {
   }
 });
 
+//Kết thúc trang đăng ký và xử lý trang đăng ký
 
-
-// Trang hộp thư đến (chỉ khi đã đăng nhập)
+// Trang hộp thư đến 
 app.get('/inbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
-    return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
+      return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
   }
 
   const page = parseInt(req.query.page) || 1;
@@ -118,44 +126,50 @@ app.get('/inbox', async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
-    const [emails] = await pool.query('SELECT * FROM emails WHERE receiver_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [req.cookies.userId, limit, offset]);
-    const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE receiver_id = ?', [req.cookies.userId]);
-    const totalPages = Math.ceil(totalEmails[0].count / limit);
-    const prevPage = page > 1 ? page - 1 : null;
-    const nextPage = page < totalPages ? page + 1 : null;
+      const [emails] = await pool.query('SELECT * FROM emails WHERE receiver_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [req.cookies.userId, limit, offset]);
+      const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE receiver_id = ?', [req.cookies.userId]);
+      const totalPages = Math.ceil(totalEmails[0].count / limit);
+      const prevPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
 
-    const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
-    
-    if (!user || user.length === 0) {
+      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+
+      if (!user || user.length === 0) {
+          res.clearCookie('loggedIn');
+          res.clearCookie('userId');
+          return res.status(404).render('signin', { errorMessage: 'User not found. Please login again.' });
+      }
+
+      res.render('inbox', {
+          title: 'Inbox',
+          emails,
+          loggedIn: req.cookies.loggedIn,
+          userFullname: user[0].fullname,
+          prevPage,
+          nextPage,
+      });
+  } catch (error) {
+      console.error(error);
       res.clearCookie('loggedIn');
       res.clearCookie('userId');
-      return res.status(404).render('signin', { errorMessage: 'User not found. Please login again.' });
-    }
-
-    res.render('inbox', {
-      title: 'Inbox',
-      emails,
-      loggedIn: req.cookies.loggedIn,
-      userFullname: user[0].fullname,
-      prevPage,
-      nextPage
-    });
-  } catch (error) {
-    console.error(error);
-    res.clearCookie('loggedIn');
-    res.clearCookie('userId');
-    res.status(500).render('signin', { errorMessage: 'An error occurred, please login again.' });
+      res.status(500).render('signin', { errorMessage: 'An error occurred, please login again.' });
   }
 });
-//compose
+
+// Kết thúc inbox.hbs
+
+
+
+
+//compose và Xử lý gửi email
+
 app.get('/compose', async (req, res) => {
   if (!req.cookies.loggedIn) {
     return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
   }
-
-  // Lấy danh sách người dùng trừ người đang đăng nhập
   const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
-  const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]); // Lấy tên người dùng đang đăng nhập
+
+  const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
 
   res.render('compose', {
     users,
@@ -164,63 +178,113 @@ app.get('/compose', async (req, res) => {
   });
 });
 
-// Xử lý gửi email
 app.post('/compose', async (req, res) => {
   const { recipient, subject, body } = req.body;
 
   // Kiểm tra xem người nhận đã được chọn chưa
   if (!recipient) {
-    return res.render('compose', { errorMessage: 'Please select a recipient.', users: await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]) });
+      // Lấy tên người dùng đang đăng nhập
+      const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
+
+      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+
+      return res.render('compose', { 
+          errorMessage: 'Please select a recipient.', 
+          users,
+          loggedIn: req.cookies.loggedIn,
+          userFullname: user[0]?.fullname // Lưu lại tên đầy đủ của người dùng
+      });
   }
 
   try {
-    // Thêm email vào cơ sở dữ liệu
-    await pool.query('INSERT INTO emails (sender_id, receiver_id, subject, body) VALUES (?, ?, ?, ?)', [req.cookies.userId, recipient, subject || null, body || null]);
+      // Thêm email vào cơ sở dữ liệu
+      const result = await pool.query(
+          'INSERT INTO emails (sender_id, receiver_id, subject, body) VALUES (?, ?, ?, ?)', 
+          [req.cookies.userId, recipient, subject || null, body || null]
+      );
 
-    res.render('compose', { successMessage: 'Email sent successfully!', users: await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]) });
+      // Lấy danh sách người dùng trừ người đang đăng nhập
+      const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
+      // Lấy tên người dùng đang đăng nhập
+      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+
+      // Kiểm tra xem email có được thêm thành công không
+      if (result[0].affectedRows > 0) {
+          res.render('compose', { 
+              successMessage: 'Email sent successfully!', 
+              users,
+              loggedIn: req.cookies.loggedIn,
+              userFullname: user[0]?.fullname // Lưu lại tên đầy đủ của người dùng
+          });
+      } else {
+          res.render('compose', { 
+              errorMessage: 'Failed to send email. Please try again.', 
+              users,
+              loggedIn: req.cookies.loggedIn,
+              userFullname: user[0]?.fullname // Lưu lại tên đầy đủ của người dùng
+          });
+      }
   } catch (error) {
-    console.error(error);
-    res.render('compose', { errorMessage: 'An error occurred while sending the email. Please try again.', users: await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]) });
+      console.error(error);
+      // Lấy tên người dùng đang đăng nhập
+      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+
+      res.render('compose', { 
+          errorMessage: 'An error occurred while sending the email. Please try again.', 
+          users,
+          loggedIn: req.cookies.loggedIn,
+          userFullname: user[0]?.fullname // Lưu lại tên đầy đủ của người dùng
+      });
   }
 });
+//Kết thúc compose và Xử lý gửi email
 
 
 //outbox 
 app.get('/outbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
-    return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
+      return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
   }
 
-  const page = parseInt(req.query.page) || 1; // Lấy số trang từ query string
-  const limit = 5; // Số email hiển thị mỗi trang
-  const offset = (page - 1) * limit; // Tính offset
+  const page = parseInt(req.query.page) || 1;
+  const limit = 5;
+  const offset = (page - 1) * limit;
 
   try {
-    const [emails] = await pool.query('SELECT e.*, u.fullname AS recipient FROM emails e JOIN users u ON e.receiver_id = u.id WHERE e.sender_id = ? ORDER BY e.created_at DESC LIMIT ? OFFSET ?', [req.cookies.userId, limit, offset]);
-    const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE sender_id = ?', [req.cookies.userId]);
-    const totalPages = Math.ceil(totalEmails[0].count / limit); // Tính tổng số trang
-    const prevPage = page > 1 ? page - 1 : null; // Trang trước
-    const nextPage = page < totalPages ? page + 1 : null; // Trang sau
+      const [emails] = await pool.query('SELECT * FROM emails WHERE sender_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [req.cookies.userId, limit, offset]);
+      const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE sender_id = ?', [req.cookies.userId]);
+      const totalPages = Math.ceil(totalEmails[0].count / limit);
+      const prevPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
 
-    const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+      const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
 
-    res.render('outbox', {
-      title: 'Outbox',
-      emails,
-      loggedIn: req.cookies.loggedIn,
-      userFullname: user[0].fullname,
-      prevPage,
-      nextPage
-    });
+      if (!user || user.length === 0) {
+          res.clearCookie('loggedIn');
+          res.clearCookie('userId');
+          return res.status(404).render('signin', { errorMessage: 'User not found. Please login again.' });
+      }
+
+      res.render('outbox', {
+          title: 'Outbox',
+          emails,
+          loggedIn: req.cookies.loggedIn,
+          userFullname: user[0].fullname,
+          prevPage,
+          nextPage,
+      });
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Có lỗi xảy ra, vui lòng thử lại!');
+      console.error(error);
+      res.clearCookie('loggedIn');
+      res.clearCookie('userId');
+      res.status(500).render('signin', { errorMessage: 'An error occurred, please login again.' });
   }
 });
+//Kết thúc outbox
 
 
-
-
+//Email_detail
 app.get('/email/:id', async (req, res) => {
   const emailId = req.params.id;
 
@@ -248,14 +312,17 @@ app.get('/email/:id', async (req, res) => {
     }
     res.render('email_detail', { 
       email,
-      userFullname: user[0].fullname,  // Truyền fullname vào view
-      loggedIn: req.cookies.loggedIn, // Truyền trạng thái đăng nhập vào view
+      userFullname: user[0].fullname,
+      loggedIn: req.cookies.loggedIn, 
     });
   } catch (error) {
     console.error(error);
     res.status(500).render('error', { message: 'An error occurred, please try again later.' });
   }
 });
+
+//KẾt thúc Email_detail
+
 app.get('/logout', (req, res) => {
   res.clearCookie('loggedIn');
   res.clearCookie('userId');
