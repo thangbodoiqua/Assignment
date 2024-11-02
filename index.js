@@ -220,14 +220,47 @@ app.get('/outbox', async (req, res) => {
 
 
 
+
+app.get('/email/:id', async (req, res) => {
+  const emailId = req.params.id;
+
+  // Kiểm tra trạng thái đăng nhập
+  if (!req.cookies.loggedIn) {
+    return res.redirect('/signin');
+  }
+
+  try {
+    const [emails] = await pool.query(
+      `SELECT emails.*, users.fullname AS sender_name 
+       FROM emails 
+       JOIN users ON emails.sender_id = users.id 
+       WHERE emails.id = ? AND (emails.receiver_id = ? OR emails.sender_id = ?)`,
+      [emailId, req.cookies.userId, req.cookies.userId]
+    );
+    if (emails.length === 0) {
+      return res.status(404).render('error', { message: 'Email not found or you do not have permission to view it.' });
+    }
+    const email = emails[0];
+    const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+
+    if (!user || user.length === 0) {
+      return res.status(404).render('error', { message: 'User not found. Please login again.' });
+    }
+    res.render('email_detail', { 
+      email,
+      userFullname: user[0].fullname,  // Truyền fullname vào view
+      loggedIn: req.cookies.loggedIn, // Truyền trạng thái đăng nhập vào view
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).render('error', { message: 'An error occurred, please try again later.' });
+  }
+});
 app.get('/logout', (req, res) => {
   res.clearCookie('loggedIn');
   res.clearCookie('userId');
   res.redirect('/');
 });
-
-
-
 const PORT = 8000;
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);

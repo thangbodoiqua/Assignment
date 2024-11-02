@@ -1,12 +1,72 @@
-<!-- views/emailDetail.hbs -->
-<h2>Email Detail</h2>
-<div>
-    <p><strong>From:</strong> {{email.sender}}</p>
-    <p><strong>To:</strong> {{email.recipient}}</p>
-    <p><strong>Subject:</strong> {{email.subject}}</p>
-    <p><strong>Body:</strong></p>
-    <p>{{email.body}}</p>
-    {{#if email.attachment}}
-    <p><a href="{{email.attachment}}" download>Download Attachment</a></p>
-    {{/if}}
+<style>
+    /* Container chính cho email detail */
+    .email-detail-container {
+        max-width: 600px;
+        margin: 80px auto; /* Đặt lề để không đụng vào header */
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: #333;
+    }
+
+    /* Tiêu đề email */
+    .email-detail-container h2 {
+        color: #1E1E2F;
+        font-size: 1.8em;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #FFD700;
+        padding-bottom: 5px;
+    }
+
+    /* Thông tin chi tiết (From, Date) */
+    .email-detail-container p {
+        margin: 10px 0;
+        font-size: 1em;
+        color: #555;
+    }
+    
+    .email-detail-container p strong {
+        color: #1E1E2F;
+    }
+
+    /* Nội dung email */
+    .email-detail-container hr {
+        border: none;
+        height: 1px;
+        background-color: #ddd;
+        margin: 20px 0;
+    }
+
+    .email-detail-container p.email-body {
+        line-height: 1.6;
+        color: #444;
+    }
+
+    /* Link quay lại */
+    .email-detail-container a {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #FFD700;
+        color: #1E1E2F;
+        text-decoration: none;
+        border-radius: 20px;
+        font-weight: bold;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .email-detail-container a:hover {
+        background-color: #FFC107;
+        transform: scale(1.05);
+    }
+</style>
+
+<div class="email-detail-container">
+    <h2>{{email.subject}}</h2>
+    <p><strong>From:</strong> {{email.sender_name}}</p>
+    <p><strong>Date:</strong> {{formatDate email.created_at}}</p>
+    <hr>
+    <p class="email-body">{{email.body}}</p>
+    <a href="/inbox">Back to Inbox</a>
 </div>

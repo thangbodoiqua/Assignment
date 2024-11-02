@@ -1,60 +1,62 @@
-<style>
-    .main-header {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #1E1E2F;
-        color: #ffffff;
-        padding: 15px 30px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 70px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-        transition: background-color 0.3s ease;
-    }
+    <!-- views/partials/header.hbs -->
 
-    .main-header:hover {
-        background-color: #25253C; /* Hiệu ứng hover */
-    }
+    <style>
+        .main-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #1E1E2F;
+            color: #ffffff;
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 70px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
 
-    .main-header .logo a {
-        color: #FFD700; 
-        font-size: 1.8em;
-        font-weight: bold;
-        text-transform: uppercase;
-        text-decoration: none;
-    }
+        .main-header:hover {
+            background-color: #25253C; /* Hiệu ứng hover */
+        }
 
-    .main-header .header-actions .btn {
-        margin-left: 15px;
-        padding: 10px 20px;
-        color: #1E1E2F;
-        background-color: #FFD700;
-        border: none;
-        border-radius: 20px;
-        font-weight: bold;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
+        .main-header .logo a {
+            color: #FFD700; 
+            font-size: 1.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
 
-    .main-header .header-actions .btn:hover {
-        background-color: #FFC107; 
-        transform: scale(1.1); 
-    }
-</style>
-<header class="main-header">
-    <div class="logo">
-        <a href="/">My Email App</a>
-    </div>
-    <div class="header-actions">
-        {{#if loggedIn}} 
-            <span>Welcome, {{userFullname}}!</span> 
-            <a href="/logout" class="btn">Log Out</a> 
-        {{else}}
-            <a href="/" class="btn">Sign In</a>
-            <a href="/signup" class="btn">Sign Up</a> <!-- Nút Sign In và Sign Up -->
-        {{/if}}
-    </div>
-</header>
+        .main-header .header-actions .btn {
+            margin-left: 15px;
+            padding: 10px 20px;
+            color: #1E1E2F;
+            background-color: #FFD700;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .main-header .header-actions .btn:hover {
+            background-color: #FFC107; 
+            transform: scale(1.1); 
+        }
+    </style>
+    <header class="main-header">
+        <div class="logo">
+            <a href="/">My Email App</a>
+        </div>
+        <div class="header-actions">
+            {{#if loggedIn}} 
+                <span>Welcome, {{userFullname}}!</span> 
+                <a href="/logout" class="btn">Log Out</a> 
+            {{else}}
+                <a href="/" class="btn">Sign In</a>
+                <a href="/signup" class="btn">Sign Up</a> <!-- Nút Sign In và Sign Up -->
+            {{/if}}
+        </div>
+    </header>
