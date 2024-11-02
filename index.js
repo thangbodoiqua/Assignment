@@ -5,7 +5,6 @@ const express = require('express');
 const { engine } = require('express-handlebars');
 const cookieParser = require('cookie-parser');
 const mysql = require('mysql2/promise');
-
 const app = express();
 
 
@@ -47,15 +46,15 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
+  console.log(req.body);
   const { email, password } = req.body;
 
   try {
-    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    if (rows.length > 0) {
-      const user = rows[0];
+    const [[user]] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    if (user) {
       if (user.password === password) {
-        res.cookie('loggedIn', true, { httpOnly: true });
-        res.cookie('userId', user.id, { httpOnly: true }); // Lưu userId trong cookie
+        res.cookie('loggedIn', true, { httpOnly: true, maxAge: 10 * 60 * 1000 });
+        res.cookie('userId', user.id, { httpOnly: true, maxAge: 10* 60 * 1000 });
         res.redirect('/inbox');
       } else {
         res.render('signin', { errorMessage: 'Wrong email or password!' });
@@ -64,7 +63,6 @@ app.post('/login', async (req, res) => {
       res.render('signin', { errorMessage: 'Wrong email or password!' });
     }
   } catch (error) {
-    console.error(error);
     res.render('signin', { errorMessage: 'There is an error, please try again' });
   }
 });
@@ -75,7 +73,7 @@ app.post('/login', async (req, res) => {
 // Trang đăng ký
 app.get('/signup', (req, res) => {
   if (req.cookies.loggedIn) {
-    return res.redirect('/inbox'); // Nếu đã đăng nhập, chuyển hướng đến inbox
+    return res.redirect('/inbox');
   }
   res.render('signup');
 });
@@ -83,11 +81,6 @@ app.get('/signup', (req, res) => {
 // Xử lý đăng ký
 app.post('/register', async (req, res) => {
   const { fullname, email, password, confirmPassword } = req.body;
-
-  // Kiểm tra các điều kiện nhập liệu
-  if (!fullname || !email || !password || !confirmPassword) {
-      return res.render('signup', { error: 'Please fill in all fields.', fullname, email });
-  }
 
   if (password.length < 6) {
       return res.render('signup', { error: 'Password must be at least 6 characters long.', fullname, email });
@@ -100,16 +93,15 @@ app.post('/register', async (req, res) => {
   try {
       const [existingUser] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
       if (existingUser.length > 0) {
-          return res.render('signup', { error: 'Email is already in use!', fullname, email });
+          return res.render('signup', { error: 'Email is already in use!', fullname});
       }
 
-      // Nếu tất cả điều kiện đều hợp lệ, thực hiện đăng ký
       await pool.query('INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)', [fullname, email, password]);
 
       return res.render('signin', { successMessage: 'Registration successful! Please sign in.' });
   } catch (error) {
       console.error(error);
-      return res.render('signup', { error: 'An error occurred, please try again!', fullname, email });
+      return res.render('signup', { error: 'An error occurred, please try again!'});
   }
 });
 

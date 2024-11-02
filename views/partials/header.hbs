@@ -1,62 +1,154 @@
-    <!-- views/partials/header.hbs -->
+<style>
+    /* Header styling */
+    .main-header {
+        position: fixed; 
+        top: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #1E1E2F;
+        color: #ffffff;
+        padding: 15px 30px;
+        height: 70px; /* Chiều cao cố định của header */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease;
+        z-index: 1000; /* Thêm z-index để đảm bảo hiển thị trên các phần tử khác */
+    }
 
-    <style>
+
+
+    /* Logo styling */
+    .main-header .logo a {
+        color: #FFD700;
+        font-size: 1.8em;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+
+    /* Header actions styling */
+    .main-header .header-actions {
+        display: flex;
+        align-items: center;
+    }
+
+    .main-header .header-actions .btn {
+        margin-left: 15px;
+        padding: 10px 20px;
+        color: #1E1E2F;
+        background-color: #FFD700;
+        border: none;
+        border-radius: 20px;
+        font-weight: bold;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .main-header .header-actions .btn:hover {
+        background-color: #FFC107;
+        transform: scale(1.1);
+    }
+
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
         .main-header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
+            padding: 10px 20px;
+        }
+
+        /* Logo size adjustment */
+        .main-header .logo a {
+    color: #FFD700;
+    font-size: 1.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.3s ease; /* Thêm transition cho logo */
+}
+
+
+        /* Collapse header actions */
+        .main-header .header-actions {
+            display: none;
+            flex-direction: column;
             align-items: center;
             background-color: #1E1E2F;
-            color: #ffffff;
-            padding: 15px 30px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 70px;
+            position: absolute;
+            top: 70px; /* Đặt vị trí ngay dưới header */
+            right: 0;
+            width: 100%;
+            padding: 20px 0;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            transition: background-color 0.3s ease;
         }
 
-        .main-header:hover {
-            background-color: #25253C; 
+        /* Show header actions when menu is active */
+        .main-header.active .header-actions {
+            display: flex;
         }
 
-        .main-header .logo a {
-            color: #FFD700; 
-            font-size: 1.8em;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-decoration: none;
+        /* Adjust button spacing for mobile view */
+       .main-header .header-actions .btn {
+    margin-left: 15px;
+    padding: 10px 20px;
+    color: #1E1E2F;
+    background-color: #FFD700;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Thêm transition cho nút */
+    white-space: nowrap;
+}
+.main-header .header-actions .btn:hover {
+    background-color: #FFC107; /* Màu khi hover */
+}
+.main-header:hover {
+    background-color: #1E1E2F; /* Bỏ hiệu ứng hover cho header */
+}
+
+        /* Hamburger menu icon */
+        .main-header .menu-icon {
+            display: inline-block;
+            cursor: pointer;
         }
 
-        .main-header .header-actions .btn {
-            margin-left: 15px;
-            padding: 10px 20px;
-            color: #1E1E2F;
+        .menu-icon div {
+            width: 25px;
+            height: 3px;
             background-color: #FFD700;
-            border: none;
-            border-radius: 20px;
-            font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin: 5px 0;
+            transition: all 0.3s ease;
         }
+    }
+</style>
 
-        .main-header .header-actions .btn:hover {
-            background-color: #FFC107; 
-            transform: scale(1.1); 
-        }
-    </style>
-    <header class="main-header">
-        <div class="logo">
-            <a href="/">My Email App</a>
-        </div>
-        <div class="header-actions">
-            {{#if loggedIn}} 
-                <span>Welcome, {{userFullname}}!</span> 
-                <a href="/logout" class="btn">Log Out</a> 
-            {{else}}
-                <a href="/" class="btn">Sign In</a>
-                <a href="/signup" class="btn">Sign Up</a> 
-            {{/if}}
-        </div>
-    </header>
+<header class="main-header">
+    <div class="logo">
+        <a href="/">HANU EMAIL</a>
+    </div>
+
+    <!-- Hamburger menu icon for mobile -->
+    <div class="menu-icon" onclick="toggleMenu()">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <!-- Header actions with conditional rendering for login state -->
+    <div class="header-actions">
+        {{#if loggedIn}}
+            <span>Welcome, {{userFullname}}!</span>
+            <a href="/logout" class="btn">Sign Out</a>
+        {{else}}
+            <a href="/" class="btn">Sign In</a>
+            <a href="/signup" class="btn">Sign Up</a>
+        {{/if}}
+    </div>
+</header>
+
+<script>
+    // JavaScript to toggle the header actions for mobile view
+    function toggleMenu() {
+        const header = document.querySelector('.main-header');
+        header.classList.toggle('active');
+    }
+</script>

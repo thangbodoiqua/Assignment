@@ -1,4 +1,3 @@
-<!-- views/layouts/main.hbs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,41 +9,40 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
     <style>
         * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    margin: 0;
-}
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
 
-.container {
-    flex: 1;
-    margin-top: 90px; /* Tạo khoảng trống bằng chiều cao header */
-    padding: 20px;
-    padding-bottom: 60px; /* Khoảng trống cho footer */
-}
+        .container {
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 60px; /* Khoảng trống cho footer */
+        }
 
-.error-message {
-    color: red;
-    font-size: 0.9em;
-    margin-bottom: 1em;
-}
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-bottom: 1em;
+        }
 
-.success-message {
-    color: green;
-    font-size: 0.9em;
-    margin-bottom: 1em;
-}
+        .success-message {
+            color: green;
+            font-size: 0.9em;
+            margin-bottom: 1em;
+        }
     </style>
 </head>
 <body>
-    {{> header loggedIn=loggedIn userFullname=userFullname}} <!-- Truyền loggedIn và userFullname vào header -->
+    {{> header loggedIn=loggedIn userFullname=userFullname}}
     <div class="container">
         {{{body}}}
     </div>

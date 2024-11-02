@@ -1,82 +1,89 @@
-<!-- views/outbox.hbs -->
 <style>
     body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f7fa; /* Nền trang nhẹ nhàng */
+        font-family: 'Roboto', sans-serif;
+        background-color: #f0f3f5;
+        margin: 0;
+        padding: 0;
     }
 
     .outbox-container {
-        display: flex; /* Sử dụng flexbox để bố trí */
-        margin-top: 80px; 
+        display: flex;
+        margin-top: 80px;
+        padding: 20px;
     }
 
     .sidebar {
-        width: 250px; /* Chiều rộng menu bên trái */
+        width: 250px;
         padding: 20px;
-        background-color: #007bff; /* Màu nền cho menu */
-        color: white; /* Màu chữ */
-        border-right: 1px solid #0056b3; /* Đường viền bên phải */
-        height: calc(100vh - 80px); /* Chiều cao menu */
-        position: sticky; /* Menu luôn nằm bên trái khi cuộn */
-        top: 80px; /* Căn chỉnh với header */
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Đổ bóng cho menu */
+        background-color: #004d99;
+        color: #ffffff;
+        border-radius: 12px;
+        height: calc(100vh - 100px);
+        position: sticky;
+        top: 80px;
+        box-shadow: 3px 0 8px rgba(0, 0, 0, 0.15);
     }
 
     .sidebar a {
         display: block;
-        margin: 10px 0;
-        padding: 10px;
+        padding: 12px 15px;
+        color: #ffffff;
         text-decoration: none;
-        color: white; /* Màu chữ liên kết */
-        border-radius: 4px; /* Bo góc cho liên kết */
-        transition: background-color 0.3s, color 0.3s; /* Hiệu ứng chuyển màu */
+        font-weight: 500;
+        border-radius: 8px;
+        transition: 0.3s;
+        margin-bottom: 10px;
     }
 
     .sidebar a:hover {
-        background-color: #0056b3; /* Màu nền khi hover */
-        color: #e0e0e0; /* Màu chữ khi hover */
+        background-color: #003366;
+        transform: scale(1.05);
     }
 
     .outbox-content {
-        flex: 1; /* Chiếm không gian còn lại của trang */
-        padding: 20px; /* Khoảng cách nội dung */
-        background-color: #ffffff; /* Nền trắng cho nội dung */
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng cho nội dung */
-        border-radius: 8px; /* Bo góc cho nội dung */
+        flex: 1;
+        margin-left: 20px;
+        padding: 25px;
+        background: #ffffff;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
     }
 
-    h2 {
-        color: #333; /* Màu tiêu đề */
+    .outbox-content h2 {
+        color: #003366;
+        font-size: 1.8em;
+        margin-bottom: 20px;
     }
 
     .email-list {
-        margin: 20px 0;
-        padding: 0;
         list-style: none;
+        padding: 0;
+        margin: 0;
     }
 
     .email-item {
         padding: 15px;
         border: 1px solid #ddd;
-        border-radius: 5px;
-        margin-bottom: 10px;
-        background-color: #ffffff;
-        transition: background-color 0.3s ease;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        margin-bottom: 15px;
+        transition: background-color 0.3s, transform 0.3s;
     }
 
     .email-item:hover {
         cursor: pointer;
-        background-color: #f1f1f1; /* Hiệu ứng hover */
+        background-color: #f1f1f1;
+        transform: scale(1.02);
     }
 
     .email-item h3 {
         margin: 0;
-        color: #007bff; /* Màu tiêu đề email */
+        color: #004d99;
     }
 
     .email-item p {
         margin: 5px 0;
-        color: #555; /* Màu nội dung email */
+        color: #555;
     }
 
     .pagination {
@@ -97,7 +104,7 @@
 
     .pagination a:hover {
         background-color: #007bff;
-        color: white; /* Màu chữ khi hover */
+        color: white;
     }
 </style>
 
@@ -112,7 +119,7 @@
         <ul class="email-list">
             {{#each emails}}
             <li class="email-item">
-                <a href="/email/{{this.id}}"><!-- Link đến trang chi tiết email -->
+                <a href="/email/{{this.id}}">
                     <h3>{{this.recipient}} - {{this.subject}}</h3>
                     <p><small>Sent on: {{formatDate this.created_at}}</small></p>
                 </a>
@@ -128,4 +135,4 @@
             {{/if}}
         </div>
     </div>
-    </div>
+</div>

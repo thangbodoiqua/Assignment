@@ -1,28 +1,76 @@
 <!-- views/signup.hbs -->
 <style>
-    /* CSS cho trang Sign Up */
+   
+
     body {
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        background-color: #f8f9fa;
-        padding-top: 80px; /* Đảm bảo header không bị che */
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(
+                rgba(30, 30, 47, 0.8),
+                rgba(30, 30, 47, 0.8)
+            ),
+            linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: #ffffff;
+        padding-top: 350px; /* Đảm bảo header không bị che */
         box-sizing: border-box;
+    }
+
+    .signup-container {
+        display: flex;
+        width: 90%;
+        max-width: 900px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Phần giới thiệu */
+    .signup-welcome {
+        flex: 1;
+        padding: 40px;
+        background-color: #1e1e2f;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .signup-welcome h1 {
+        font-size: 2em;
+        margin-bottom: 20px;
+        color: #ffd700;
+    }
+
+    .signup-welcome p {
+        font-size: 1.1em;
+        color: #cfd8dc;
+    }
+
+    /* Phần form đăng ký */
+    .signup-form-container {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     h2 {
         text-align: center;
-        color: #333;
+        color: #1e1e2f;
         margin-bottom: 20px;
     }
 
     .signup-form {
         background-color: #ffffff;
-        padding: 30px 20px;
+        padding: 20px;
         border-radius: 8px;
-        max-width: 400px;
-        margin: auto;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
@@ -49,15 +97,15 @@
     .signup-form input[type="text"]:focus,
     .signup-form input[type="email"]:focus,
     .signup-form input[type="password"]:focus {
-        border-color: #FFD700;
+        border-color: #ffd700;
         outline: none;
     }
 
     .signup-form button {
         width: 100%;
         padding: 10px;
-        background-color: #FFD700;
-        color: #1E1E2F;
+        background-color: #ffd700;
+        color: #1e1e2f;
         border: none;
         border-radius: 20px;
         font-weight: bold;
@@ -66,7 +114,7 @@
     }
 
     .signup-form button:hover {
-        background-color: #FFC107;
+        background-color: #ffc107;
         transform: scale(1.05);
     }
 
@@ -93,30 +141,56 @@
         color: green;
         text-align: center;
     }
+
+    /* Responsive layout */
+    @media (max-width: 768px) {
+        .signup-container {
+            flex-direction: column;
+            max-width: 100%;
+        }
+
+        .signup-welcome {
+            padding: 20px;
+        }
+
+        .signup-form-container {
+            padding: 20px;
+        }
+    }
 </style>
-<h2>Sign Up</h2>
 
-{{#if error}}
-    <p class="error-message">{{error}}</p>
-{{/if}}
+<div class="signup-container">
+    <!-- Phần giới thiệu ở bên trái -->
+    <div class="signup-welcome">
+        <h1>Create Your Account</h1>
 
-<form id="signupForm" class="signup-form" action="/register" method="POST">
-    <div>
-        <label for="fullname">Full Name:</label>
-        <input type="text" id="fullname" name="fullname" value="{{fullname}}" placeholder="Enter your full name" required>
     </div>
-    <div>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="{{email}}" placeholder="Enter your email" required>
+
+    <!-- Phần form đăng ký ở bên phải -->
+    <div class="signup-form-container">
+        <h2>Sign Up</h2>
+        {{#if error}}
+            <p class="error-message">{{error}}</p>
+        {{/if}}
+        <form id="signupForm" class="signup-form" action="/register" method="POST">
+            <div>
+                <label for="fullname">Full Name:</label>
+                <input type="text" id="fullname" name="fullname" value="{{fullname}}" placeholder="Enter your full name" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{email}}" placeholder="Enter your email" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <div>
+                <label for="confirmPassword">Confirm Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required>
+            </div>
+            <button type="submit">Sign Up</button>
+        </form>
+        <span style="color: black;">Already have an account? <a href="/signin" style="text-decoration: underline; color: blue">Sign in</a></span>
     </div>
-    <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-    </div>
-    <div>
-        <label for="confirmPassword">Confirm Password:</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required>
-    </div>
-    <button type="submit">Sign Up</button>
-</form>
-    <span href="/signup">Already have an account? <a href="/signup" style="text-decoration: underline; color:blue" >Sign in</a></spans>
+</div>

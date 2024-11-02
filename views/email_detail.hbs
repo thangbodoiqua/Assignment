@@ -1,60 +1,75 @@
-    <!-- views/email_detail.hbs -->
-
 <style>
     .email-detail-container {
-        max-width: 600px;
-        margin: 80px auto; 
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 100px auto;
+        padding: 40px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         color: #333;
+        font-family: 'Roboto', sans-serif;
+        line-height: 1.6;
     }
 
     .email-detail-container h2 {
-        color: #1E1E2F;
-        font-size: 1.8em;
-        margin-bottom: 15px;
-        border-bottom: 2px solid #FFD700;
-        padding-bottom: 5px;
+        font-size: 2.2em;
+        color: #004d99;
+        border-bottom: 3px solid #ffb400;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        font-weight: 600;
     }
 
     .email-detail-container p {
-        margin: 10px 0;
-        font-size: 1em;
+        font-size: 1.05em;
         color: #555;
+        margin: 10px 0;
     }
-    
+
     .email-detail-container p strong {
-        color: #1E1E2F;
+        color: #004d99;
+    }
+
+    .email-body-title {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #333;
+        margin-top: 30px;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+    }
+
+    .email-body {
+        font-size: 1.1em;
+        color: #444;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
     }
 
     .email-detail-container hr {
         border: none;
         height: 1px;
         background-color: #ddd;
-        margin: 20px 0;
-    }
-
-    .email-detail-container p.email-body {
-        line-height: 1.6;
-        color: #444;
+        margin: 25px 0;
     }
 
     .email-detail-container a {
         display: inline-block;
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #FFD700;
-        color: #1E1E2F;
+        margin-top: 25px;
+        padding: 15px 30px;
+        background-color: #ffb400;
+        color: #333;
         text-decoration: none;
-        border-radius: 20px;
-        font-weight: bold;
+        border-radius: 10px;
+        font-weight: 600;
         transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
     .email-detail-container a:hover {
-        background-color: #FFC107;
+        background-color: #e6a200;
         transform: scale(1.05);
     }
 </style>
@@ -64,6 +79,7 @@
     <p><strong>From:</strong> {{email.sender_name}}</p>
     <p><strong>Date:</strong> {{formatDate email.created_at}}</p>
     <hr>
+    <p class="email-body-title">Email Content:</p>
     <p class="email-body">{{email.body}}</p>
     <a href="/inbox">Back to Inbox</a>
 </div>
