@@ -23,6 +23,9 @@ app.engine('hbs', engine({
       formatDate: (date) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         return new Date(date).toLocaleDateString('en-US', options);
+      },
+      eq: (a, b) => {
+          return a === b;
       }
   }
 }));
@@ -110,19 +113,28 @@ app.post('/register', async (req, res) => {
 // Trang hộp thư đến 
 app.get('/inbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
-    return res.status(403).render('access_denied');
-}
+      return res.status(403).render('access_denied');
+  }
 
   const page = parseInt(req.query.page) || 1;
   const limit = 5;
   const offset = (page - 1) * limit;
 
   try {
-      const [emails] = await pool.query('SELECT * FROM emails WHERE receiver_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [req.cookies.userId, limit, offset]);
+      const [emails] = await pool.query(
+          'SELECT e.id, u.fullname AS sender, e.subject, e.created_at FROM emails e JOIN users u ON e.sender_id = u.id WHERE e.receiver_id = ? ORDER BY e.created_at DESC LIMIT ? OFFSET ?', 
+          [req.cookies.userId, limit, offset]
+      );
       const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE receiver_id = ?', [req.cookies.userId]);
       const totalPages = Math.ceil(totalEmails[0].count / limit);
       const prevPage = page > 1 ? page - 1 : null;
       const nextPage = page < totalPages ? page + 1 : null;
+
+      // Tạo danh sách các số trang
+      const pages = Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+          const pageNum = i + 1 + Math.max(0, page - 3);
+          return pageNum <= totalPages && pageNum > 0 ? pageNum : null;
+      }).filter(num => num); // Lọc ra các số trang hợp lệ
 
       const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
 
@@ -139,6 +151,8 @@ app.get('/inbox', async (req, res) => {
           userFullname: user[0].fullname,
           prevPage,
           nextPage,
+          pages,
+          page // Để truyền vào template để kiểm tra số trang hiện tại
       });
   } catch (error) {
       console.error(error);
@@ -235,7 +249,7 @@ app.post('/compose', async (req, res) => {
 //outbox 
 app.get('/outbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
-    return res.status(403).render('access_denied');
+      return res.status(403).render('access_denied');
   }
 
   const page = parseInt(req.query.page) || 1;
@@ -243,13 +257,21 @@ app.get('/outbox', async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
-      const [emails] = await pool.query('SELECT * FROM emails WHERE sender_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [req.cookies.userId, limit, offset]);
+      const [emails] = await pool.query(
+          'SELECT e.id, u.fullname AS receiver, e.subject, e.created_at FROM emails e JOIN users u ON e.receiver_id = u.id WHERE e.sender_id = ? ORDER BY e.created_at DESC LIMIT ? OFFSET ?', 
+          [req.cookies.userId, limit, offset]
+      );
       const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE sender_id = ?', [req.cookies.userId]);
       const totalPages = Math.ceil(totalEmails[0].count / limit);
       const prevPage = page > 1 ? page - 1 : null;
       const nextPage = page < totalPages ? page + 1 : null;
 
-      const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+      // Tạo danh sách các số trang
+      const pages = Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+          const pageNum = i + 1 + Math.max(0, page - 3);
+          return pageNum <= totalPages && pageNum > 0 ? pageNum : null;
+      }).filter(num => num); // Lọc ra các số trang hợp lệ
+
       const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
 
       if (!user || user.length === 0) {
@@ -265,6 +287,8 @@ app.get('/outbox', async (req, res) => {
           userFullname: user[0].fullname,
           prevPage,
           nextPage,
+          pages,
+          page // Để truyền vào template để kiểm tra số trang hiện tại
       });
   } catch (error) {
       console.error(error);

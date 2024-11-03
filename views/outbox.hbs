@@ -44,9 +44,11 @@
         flex: 1;
         margin-left: 20px;
         padding: 25px;
+        padding-bottom: 60px; /* Thêm padding dưới để tránh che khuất nội dung */
         background: #ffffff;
         box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
         border-radius: 12px;
+        position: relative; /* Để sử dụng absolute cho thanh phân trang */
     }
 
     .outbox-content h2 {
@@ -89,7 +91,15 @@
     .pagination {
         display: flex;
         justify-content: center;
-        margin: 20px 0;
+        margin: 0;
+        padding: 15px 0;
+        position: absolute; /* Để giữ cố định trong khối chứa */
+        bottom: 0; /* Cố định ở phía dưới */
+        left: 0;
+        right: 0; /* Giãn ra từ trái sang phải */
+        background: #ffffff; /* Nền cho thanh phân trang */
+        border-top: 1px solid #ddd; /* Biên trên để phân tách */
+        z-index: 10; /* Để đảm bảo nó nổi bật */
     }
 
     .pagination a {
@@ -106,6 +116,12 @@
         background-color: #007bff;
         color: white;
     }
+
+    .pagination a.active {
+        background-color: #007bff;
+        color: white;
+        cursor: default;
+    }
 </style>
 
 <div class="outbox-container">
@@ -120,7 +136,7 @@
             {{#each emails}}
             <li class="email-item">
                 <a href="/email/{{this.id}}">
-                    <h3>{{this.recipient}} - {{this.subject}}</h3>
+                    <h3>{{this.receiver}} - {{this.subject}}</h3>
                     <p><small>Sent on: {{formatDate this.created_at}}</small></p>
                 </a>
             </li>
@@ -130,6 +146,11 @@
             {{#if prevPage}}
             <a href="/outbox?page={{prevPage}}">Previous</a>
             {{/if}}
+
+            {{#each pages}}
+            <a href="/outbox?page={{this}}" class="{{#if (eq this ../page)}}active{{/if}}">{{this}}</a>
+            {{/each}}
+
             {{#if nextPage}}
             <a href="/outbox?page={{nextPage}}">Next</a>
             {{/if}}
