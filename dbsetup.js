@@ -49,15 +49,6 @@ async function setupDatabase() {
 
     const emails = [
         { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
-        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
-        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
-        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
-        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
-        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
-        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
-        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
-        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
-        { sender_id: users[0].id, receiver_id: users[1].id, subject: `from ${users[0].fullname}`, body: `to ${users[1].fullname}` },
         { sender_id: users[1].id, receiver_id: users[0].id, subject: `reply from ${users[1].fullname}`, body: `to answer ${users[0].fullname}` },
         { sender_id: users[0].id, receiver_id: users[2].id, subject: `from ${users[0].fullname}`, body: `to ${users[2].fullname}` },
         { sender_id: users[2].id, receiver_id: users[0].id, subject: `reply from ${users[2].fullname}`, body: `to answer ${users[0].fullname}` },

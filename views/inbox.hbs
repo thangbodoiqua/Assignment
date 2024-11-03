@@ -10,6 +10,8 @@
         display: flex;
         margin-top: 80px;
         padding: 20px;
+        height: calc(100vh - 80px); 
+        overflow: hidden; 
     }
 
     .sidebar {
@@ -18,7 +20,7 @@
         background-color: #004d99;
         color: #ffffff;
         border-radius: 12px;
-        height: calc(100vh - 100px);
+        height: 100%;
         position: sticky;
         top: 80px;
         box-shadow: 3px 0 8px rgba(0, 0, 0, 0.15);
@@ -31,7 +33,7 @@
         text-decoration: none;
         font-weight: 500;
         border-radius: 8px;
-        transition: 0.3s;
+        transition: background-color 0.3s, transform 0.3s;
         margin-bottom: 10px;
     }
 
@@ -44,17 +46,20 @@
         flex: 1;
         margin-left: 20px;
         padding: 25px;
-        padding-bottom: 60px; /* Thêm padding dưới để tránh che khuất nội dung */
+        padding-bottom: 60px; 
         background: #ffffff;
         box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
         border-radius: 12px;
-        position: relative; /* Để sử dụng absolute cho thanh phân trang */
+        position: relative; 
+        overflow-y: auto; 
     }
 
     .inbox-content h2 {
         color: #003366;
         font-size: 1.8em;
         margin-bottom: 20px;
+        border-bottom: 2px solid #eaeaea; 
+        padding-bottom: 10px;
     }
 
     .email-list {
@@ -70,6 +75,8 @@
         background-color: #f9f9f9;
         margin-bottom: 15px;
         transition: background-color 0.3s, transform 0.3s;
+        display: flex; 
+        align-items: center; 
     }
 
     .email-item:hover {
@@ -81,25 +88,65 @@
     .email-item h3 {
         margin: 0;
         color: #004d99;
+        flex: 1; 
     }
 
-    .email-item p {
-        margin: 5px 0;
-        color: #555;
+    .email-checkbox {
+        transform: scale(1.5); 
+        margin-right: 15px; 
+    }
+
+    .delete-button {
+        background-color: #dc3545; 
+        color: white;
+        border: none;
+        padding: 10px 15px; 
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        margin-left: auto; 
+        transition: background-color 0.3s;
+        margin-bottom: 15px; 
+    }
+
+    .delete-button:hover {
+        background-color: #c82333; 
+    }
+
+    .select-all-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px; 
+    }
+
+ .select-all-button {
+        background-color: #007bff; 
+        color: white;
+        border: none;
+        padding: 10px 15px; 
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        margin-right: 10px; 
+        transition: background-color 0.3s;
+        display: flex; 
+        align-items: center; 
+        height: 40px; 
+    }
+
+    .select-all-button:hover {
+        background-color: #0056b3; 
     }
 
     .pagination {
         display: flex;
         justify-content: center;
-        margin: 0;
+        margin: 20px 0 0; 
         padding: 15px 0;
-        position: absolute; /* Để giữ cố định trong khối chứa */
-        bottom: 0; /* Cố định ở phía dưới */
-        left: 0;
-        right: 0; /* Giãn ra từ trái sang phải */
-        background: #ffffff; /* Nền cho thanh phân trang */
-        border-top: 1px solid #ddd; /* Biên trên để phân tách */
-        z-index: 10; /* Để đảm bảo nó nổi bật */
+        position: relative; 
+        background: #ffffff; 
+        border-top: 1px solid #ddd; 
+        z-index: 10; 
     }
 
     .pagination a {
@@ -132,9 +179,15 @@
     </div>
     <div class="inbox-content">
         <h2>Inbox</h2>
+        <div class="select-all-container">
+            <input type="checkbox" id="selectAll" class="select-all-checkbox" style="transform: scale(1.5); margin-right: 10px;"> 
+            <label for="selectAll">Select All</label>
+            <button id="deleteSelectedBtn" class="delete-button">Delete Selected</button>
+        </div>
         <ul class="email-list">
             {{#each emails}}
             <li class="email-item">
+                <input type="checkbox" class="email-checkbox" data-email-id="{{this.id}}">
                 <a href="/email/{{this.id}}">
                     <h3>{{this.sender}} - {{this.subject}}</h3>
                     <p><small>Received on: {{formatDate this.created_at}}</small></p>
@@ -157,3 +210,37 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.email-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+
+    document.getElementById('deleteSelectedBtn').addEventListener('click', async () => {
+        const selectedEmails = Array.from(document.querySelectorAll('.email-checkbox:checked')).map(cb => cb.dataset.emailId);
+        
+        if (selectedEmails.length === 0) {
+            alert("Please select at least one email to delete.");
+            return;
+        }
+
+        const response = await fetch('/delete-emails', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ids: selectedEmails })
+        });
+
+        if (response.ok) {
+            selectedEmails.forEach(id => {
+                document.querySelector(`.email-checkbox[data-email-id="${id}"]`).closest('.email-item').remove();
+            });
+        } else {
+            alert("Failed to delete emails. Please try again.");
+        }
+    });
+</script>

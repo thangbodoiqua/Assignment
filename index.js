@@ -1,5 +1,4 @@
 // <!-- index.js -->// 
-//Cấu hình file
 
 const express = require('express');
 const { engine } = require('express-handlebars');
@@ -37,10 +36,8 @@ const pool = mysql.createPool({
   port: process.env.DB_PORT,
   database: process.env.DB_NAME
 });
-/// Kết thúc cấu hình
 
 
-//Trang đăng nhập
 app.get('/', (req, res) => {
   if (req.cookies.loggedIn) {
     return res.redirect('/inbox'); 
@@ -70,10 +67,8 @@ app.post('/login', async (req, res) => {
     res.render('signin', { errorMessage: 'There is an error, please try again' });
   }
 });
-//Kết thúc trang đăng nhập
 
 
-// Trang đăng ký
 app.get('/signup', (req, res) => {
   if (req.cookies.loggedIn) {
     return res.redirect('/inbox');
@@ -81,7 +76,6 @@ app.get('/signup', (req, res) => {
   res.render('signup');
 });
 
-// Xử lý đăng ký
 app.post('/register', async (req, res) => {
   const { fullname, email, password, confirmPassword } = req.body;
 
@@ -108,9 +102,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-//Kết thúc trang đăng ký và xử lý trang đăng ký
 
-// Trang hộp thư đến 
 app.get('/inbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
       return res.status(403).render('access_denied');
@@ -130,11 +122,10 @@ app.get('/inbox', async (req, res) => {
       const prevPage = page > 1 ? page - 1 : null;
       const nextPage = page < totalPages ? page + 1 : null;
 
-      // Tạo danh sách các số trang
       const pages = Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
           const pageNum = i + 1 + Math.max(0, page - 3);
           return pageNum <= totalPages && pageNum > 0 ? pageNum : null;
-      }).filter(num => num); // Lọc ra các số trang hợp lệ
+      }).filter(num => num); 
 
       const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
 
@@ -152,7 +143,7 @@ app.get('/inbox', async (req, res) => {
           prevPage,
           nextPage,
           pages,
-          page // Để truyền vào template để kiểm tra số trang hiện tại
+          page 
       });
   } catch (error) {
       console.error(error);
@@ -162,12 +153,10 @@ app.get('/inbox', async (req, res) => {
   }
 });
 
-// Kết thúc inbox.hbs
 
 
 
 
-//compose và Xử lý gửi email
 
 app.get('/compose', async (req, res) => {
   if (!req.cookies.loggedIn) {
@@ -180,16 +169,14 @@ app.get('/compose', async (req, res) => {
   res.render('compose', {
     users,
     loggedIn: req.cookies.loggedIn,
-    userFullname: user[0].fullname, // Truyền tên người dùng vào view
+    userFullname: user[0].fullname, 
   });
 });
 
 app.post('/compose', async (req, res) => {
   const { recipient, subject, body } = req.body;
 
-  // Kiểm tra xem người nhận đã được chọn chưa
   if (!recipient) {
-      // Lấy tên người dùng đang đăng nhập
       const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
 
       const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
@@ -198,55 +185,49 @@ app.post('/compose', async (req, res) => {
           errorMessage: 'Please select a recipient.', 
           users,
           loggedIn: req.cookies.loggedIn,
-          userFullname: user[0]?.fullname // Lưu lại tên đầy đủ của người dùng
+          userFullname: user[0]?.fullname 
       });
   }
 
   try {
-      // Thêm email vào cơ sở dữ liệu
       const result = await pool.query(
           'INSERT INTO emails (sender_id, receiver_id, subject, body) VALUES (?, ?, ?, ?)', 
           [req.cookies.userId, recipient, subject || null, body || null]
       );
 
-      // Lấy danh sách người dùng trừ người đang đăng nhập
       const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
-      // Lấy tên người dùng đang đăng nhập
       const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
 
-      // Kiểm tra xem email có được thêm thành công không
       if (result[0].affectedRows > 0) {
           res.render('compose', { 
               successMessage: 'Email sent successfully!', 
               users,
               loggedIn: req.cookies.loggedIn,
-              userFullname: user[0]?.fullname // Lưu lại tên đầy đủ của người dùng
+              userFullname: user[0]?.fullname 
           });
       } else {
           res.render('compose', { 
               errorMessage: 'Failed to send email. Please try again.', 
               users,
               loggedIn: req.cookies.loggedIn,
-              userFullname: user[0]?.fullname // Lưu lại tên đầy đủ của người dùng
+              userFullname: user[0]?.fullname 
           });
       }
   } catch (error) {
       console.error(error);
-      // Lấy tên người dùng đang đăng nhập
+
       const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
 
       res.render('compose', { 
           errorMessage: 'An error occurred while sending the email. Please try again.', 
           users,
           loggedIn: req.cookies.loggedIn,
-          userFullname: user[0]?.fullname // Lưu lại tên đầy đủ của người dùng
+          userFullname: user[0]?.fullname
       });
   }
 });
-//Kết thúc compose và Xử lý gửi email
 
 
-//outbox 
 app.get('/outbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
       return res.status(403).render('access_denied');
@@ -266,11 +247,10 @@ app.get('/outbox', async (req, res) => {
       const prevPage = page > 1 ? page - 1 : null;
       const nextPage = page < totalPages ? page + 1 : null;
 
-      // Tạo danh sách các số trang
       const pages = Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
           const pageNum = i + 1 + Math.max(0, page - 3);
           return pageNum <= totalPages && pageNum > 0 ? pageNum : null;
-      }).filter(num => num); // Lọc ra các số trang hợp lệ
+      }).filter(num => num); 
 
       const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
 
@@ -288,7 +268,7 @@ app.get('/outbox', async (req, res) => {
           prevPage,
           nextPage,
           pages,
-          page // Để truyền vào template để kiểm tra số trang hiện tại
+          page 
       });
   } catch (error) {
       console.error(error);
@@ -297,16 +277,13 @@ app.get('/outbox', async (req, res) => {
       res.status(500).render('signin', { errorMessage: 'An error occurred, please login again.' });
   }
 });
-//Kết thúc outbox
 
 
-//Email_detail
 app.get('/email/:id', async (req, res) => {
   const emailId = req.params.id;
 
-  // Kiểm tra trạng thái đăng nhập
   if (!req.cookies.loggedIn) {
-    return res.status(403).render('access-denied');
+    return res.status(403).render('access_denied');
   }
 
   try {
@@ -337,7 +314,6 @@ app.get('/email/:id', async (req, res) => {
   }
 });
 
-//KẾt thúc Email_detail
 
 app.get('/logout', (req, res) => {
   res.clearCookie('loggedIn');
@@ -347,4 +323,47 @@ app.get('/logout', (req, res) => {
 const PORT = 8000;
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
+});
+
+
+app.delete('/delete-emails', async (req, res) => {
+  if (!req.cookies.loggedIn) {
+      return res.status(403).json({ message: 'Access denied' });
+  }
+
+  const emailIds = req.body.ids;
+
+  try {
+      const [result] = await pool.query('DELETE FROM emails WHERE id IN (?) AND receiver_id = ?', [emailIds, req.cookies.userId]);
+
+      if (result.affectedRows > 0) {
+          return res.status(200).json({ message: 'Emails deleted successfully.' });
+      } else {
+          return res.status(404).json({ message: 'Emails not found.' });
+      }
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'An error occurred while deleting emails.' });
+  }
+});
+
+app.delete('/delete-emails-outbox', async (req, res) => {
+  if (!req.cookies.loggedIn) {
+      return res.status(403).json({ message: 'Access denied' });
+  }
+
+  const emailIds = req.body.ids;
+
+  try {
+      const [result] = await pool.query('DELETE FROM emails WHERE id IN (?) AND sender_id = ?', [emailIds, req.cookies.userId]);
+
+      if (result.affectedRows > 0) {
+          return res.status(200).json({ message: 'Emails deleted successfully.' });
+      } else {
+          return res.status(404).json({ message: 'Emails not found.' });
+      }
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'An error occurred while deleting emails.' });
+  }
 });
