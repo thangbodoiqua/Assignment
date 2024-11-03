@@ -45,6 +45,7 @@ app.get('/', (req, res) => {
   res.render('signin');
 });
 
+
 app.post('/login', async (req, res) => {
   console.log(req.body);
   const { email, password } = req.body;
@@ -67,7 +68,6 @@ app.post('/login', async (req, res) => {
   }
 });
 //Kết thúc trang đăng nhập
-
 
 
 // Trang đăng ký
@@ -110,8 +110,8 @@ app.post('/register', async (req, res) => {
 // Trang hộp thư đến 
 app.get('/inbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
-      return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
-  }
+    return res.status(403).render('access_denied');
+}
 
   const page = parseInt(req.query.page) || 1;
   const limit = 5;
@@ -157,7 +157,7 @@ app.get('/inbox', async (req, res) => {
 
 app.get('/compose', async (req, res) => {
   if (!req.cookies.loggedIn) {
-    return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
+    return res.status(403).render('access_denied');
   }
   const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
 
@@ -235,7 +235,7 @@ app.post('/compose', async (req, res) => {
 //outbox 
 app.get('/outbox', async (req, res) => {
   if (!req.cookies.loggedIn) {
-      return res.status(403).render('signin', { errorMessage: 'Please login to continue' });
+    return res.status(403).render('access_denied');
   }
 
   const page = parseInt(req.query.page) || 1;
@@ -282,7 +282,7 @@ app.get('/email/:id', async (req, res) => {
 
   // Kiểm tra trạng thái đăng nhập
   if (!req.cookies.loggedIn) {
-    return res.redirect('/signin');
+    return res.status(403).render('access-denied');
   }
 
   try {
