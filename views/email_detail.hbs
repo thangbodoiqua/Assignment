@@ -72,6 +72,28 @@
         background-color: #e6a200;
         transform: scale(1.05);
     }
+
+    .email-attachment {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #f2f2f2;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+    }
+
+    .email-attachment a {
+        margin-left: 10px;
+        color: #004d99;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .email-attachment a:hover {
+        text-decoration: underline;
+    }
 </style>
 
 <div class="email-detail-container">
@@ -81,5 +103,16 @@
     <hr>
     <p class="email-body-title">Email Content:</p>
     <p class="email-body">{{email.body}}</p>
+
+    {{#if email.attachment}}
+    <div class="email-attachment">
+        <strong>Attachment:</strong>
+        <a href="/uploads/{{email.attachment}}" target="_blank">
+            <img src="../resources/img/attach_icon.png" alt="Attachment" style="width: 24px; height: 24px; vertical-align: middle;">
+            {{email.attachment}}
+        </a>
+    </div>
+    {{/if}}
+
     <a href="/inbox">Back to Inbox</a>
 </div>

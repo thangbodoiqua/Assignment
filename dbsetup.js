@@ -31,7 +31,7 @@ async function setupDatabase() {
             receiver_id INT NOT NULL,
             subject VARCHAR(255),
             body TEXT,
-            attachment VARCHAR(255),
+            attachment VARCHAR(255),  // Cột đính kèm
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (sender_id) REFERENCES users(id),
             FOREIGN KEY (receiver_id) REFERENCES users(id)

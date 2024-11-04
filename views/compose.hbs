@@ -1,5 +1,6 @@
+{{!-- compose.hbs --}}
 <style>
-    /* Toàn bộ trang */
+    
     body {
         font-family: 'Roboto', sans-serif;
         background-color: #f0f3f5;
@@ -11,7 +12,7 @@
         display: flex;
         margin-top: 80px;
         padding: 20px;
-        gap: 20px; /* Tạo khoảng cách giữa sidebar và nội dung chính */
+        gap: 20px; 
     }
 
     .sidebar {
@@ -57,19 +58,19 @@
     }
 
     .form-group {
-        margin-bottom: 20px; /* Khoảng cách giữa các nhóm form */
+        margin-bottom: 20px; 
     }
 
     .form-group label {
         font-weight: 500;
         color: #444;
         display: block;
-        margin-bottom: 8px; /* Tạo khoảng cách giữa label và input */
+        margin-bottom: 8px; 
     }
 
     .form-control {
         width: 100%;
-        padding: 12px; /* Padding lớn hơn để tạo không gian */
+        padding: 12px; 
         border: 1px solid #ddd;
         border-radius: 6px;
         transition: 0.3s;
@@ -108,7 +109,7 @@
         cursor: pointer;
         font-weight: bold;
         transition: 0.3s;
-        margin-top: 15px; /* Khoảng cách trên cùng của nút */
+        margin-top: 15px; 
     }
 
     button:hover {
@@ -131,7 +132,7 @@
         {{#if successMessage}}
             <div class="success-message">{{successMessage}}</div>
         {{/if}}
-        <form action="/compose" method="POST">
+        <form action="/compose" method="POST"  enctype="multipart/form-data">
             <div class="form-group">
                 <label for="recipient">Recipient:</label>
                 <select id="recipient" name="recipient" class="form-control" required>
@@ -148,6 +149,8 @@
             <div class="form-group">
                 <label for="body">Email Body:</label>
                 <textarea id="body" name="body" class="form-control" rows="8" placeholder="Type your message here..."></textarea>
+                <label for="attachment">Attach a file:</label>
+        <input type="file" id="attachment" name="attachment" class="form-control">
             </div>
             <button type="submit">Send</button>
         </form>

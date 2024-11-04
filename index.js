@@ -4,15 +4,24 @@ const express = require('express');
 const { engine } = require('express-handlebars');
 const cookieParser = require('cookie-parser');
 const mysql = require('mysql2/promise');
+require('dotenv').config();
 const app = express();
+const multer = require('multer');
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, 'uploads'); 
+  },
+  filename: (req, file, cb) => {
+      cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+const upload = multer({ storage })
 
-require('dotenv').config(); 
 app.set('view engine', 'hbs');
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static('resources'));
-
 
 app.engine('hbs', engine({ 
   extname: '.hbs', 
@@ -173,59 +182,6 @@ app.get('/compose', async (req, res) => {
   });
 });
 
-app.post('/compose', async (req, res) => {
-  const { recipient, subject, body } = req.body;
-
-  if (!recipient) {
-      const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
-
-      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
-
-      return res.render('compose', { 
-          errorMessage: 'Please select a recipient.', 
-          users,
-          loggedIn: req.cookies.loggedIn,
-          userFullname: user[0]?.fullname 
-      });
-  }
-
-  try {
-      const result = await pool.query(
-          'INSERT INTO emails (sender_id, receiver_id, subject, body) VALUES (?, ?, ?, ?)', 
-          [req.cookies.userId, recipient, subject || null, body || null]
-      );
-
-      const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
-      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
-
-      if (result[0].affectedRows > 0) {
-          res.render('compose', { 
-              successMessage: 'Email sent successfully!', 
-              users,
-              loggedIn: req.cookies.loggedIn,
-              userFullname: user[0]?.fullname 
-          });
-      } else {
-          res.render('compose', { 
-              errorMessage: 'Failed to send email. Please try again.', 
-              users,
-              loggedIn: req.cookies.loggedIn,
-              userFullname: user[0]?.fullname 
-          });
-      }
-  } catch (error) {
-      console.error(error);
-
-      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
-
-      res.render('compose', { 
-          errorMessage: 'An error occurred while sending the email. Please try again.', 
-          users,
-          loggedIn: req.cookies.loggedIn,
-          userFullname: user[0]?.fullname
-      });
-  }
-});
 
 
 app.get('/outbox', async (req, res) => {
@@ -314,7 +270,6 @@ app.get('/email/:id', async (req, res) => {
   }
 });
 
-
 app.get('/logout', (req, res) => {
   res.clearCookie('loggedIn');
   res.clearCookie('userId');
@@ -366,4 +321,69 @@ app.delete('/delete-emails-outbox', async (req, res) => {
       console.error(error);
       return res.status(500).json({ message: 'An error occurred while deleting emails.' });
   }
+});
+
+app.post('/compose', upload.single('attachment'), async (req, res) => {
+  const { recipient, subject, body } = req.body;
+  console.log(req.body)
+  console.log('File upload info:', req.file); 
+
+  const attachment = req.file ? req.file.filename : null;
+  if (!recipient) {
+      const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
+      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+      return res.render('compose', {
+          errorMessage: 'Please select a recipient.',
+          users,
+          loggedIn: req.cookies.loggedIn,
+          userFullname: user[0]?.fullname
+      });
+  }
+
+  try {
+      const [result] = await pool.query(
+          'INSERT INTO emails (sender_id, receiver_id, subject, body, attachment) VALUES (?, ?, ?, ?, ?)', 
+          [req.cookies.userId, recipient, subject || null, body || null, attachment]
+      );
+
+      const [users] = await pool.query('SELECT id, fullname, email FROM users WHERE id != ?', [req.cookies.userId]);
+      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+
+      if (result.affectedRows > 0) {
+          return res.render('compose', { 
+              successMessage: 'Email sent successfully!', 
+              users,
+              loggedIn: req.cookies.loggedIn,
+              userFullname: user[0]?.fullname 
+          });
+      } else {
+          return res.render('compose', { 
+              errorMessage: 'Failed to send email. Please try again.', 
+              users,
+              loggedIn: req.cookies.loggedIn,
+              userFullname: user[0]?.fullname 
+          });
+      }
+  } catch (error) {
+      console.error(error);
+      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+      return res.render('compose', { 
+          errorMessage: 'An error occurred while sending the email. Please try again.', 
+          users,
+          loggedIn: req.cookies.loggedIn,
+          userFullname: user[0]?.fullname
+      });
+  }
+});
+
+app.get('/uploads/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filepath = 'uploads/' + filename;
+  console.log(filepath+filename);
+
+  res.download(filepath, filename, (err) => {
+      if (err) {
+          res.status(404).send('File not found');
+      }
+  });
 });
