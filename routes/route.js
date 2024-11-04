@@ -77,54 +77,65 @@ router.post('/register', async (req, res) => {
 
 
 router.get('/inbox', async (req, res) => {
-  if (!req.cookies.loggedIn) {
-      return res.status(403).render('access_denied');
-  }
-
-  const page = parseInt(req.query.page) || 1;
-  const limit = 5;
-  const offset = (page - 1) * limit;
-
-  try {
-      const [emails] = await pool.query(
-          'SELECT e.id, u.fullname AS sender, e.subject, e.created_at FROM emails e JOIN users u ON e.sender_id = u.id WHERE e.receiver_id = ? ORDER BY e.created_at DESC LIMIT ? OFFSET ?', 
-          [req.cookies.userId, limit, offset]
-      );
-      const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE receiver_id = ?', [req.cookies.userId]);
-      const totalPages = Math.ceil(totalEmails[0].count / limit);
-      const prevPage = page > 1 ? page - 1 : null;
-      const nextPage = page < totalPages ? page + 1 : null;
-
-      const pages = Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-          const pageNum = i + 1 + Math.max(0, page - 3);
-          return pageNum <= totalPages && pageNum > 0 ? pageNum : null;
-      }).filter(num => num); 
-
-      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
-
-      if (!user || user.length === 0) {
-          res.clearCookie('loggedIn');
-          res.clearCookie('userId');
-          return res.status(404).render('signin', { errorMessage: 'User not found. Please login again.' });
-      }
-
-      res.render('inbox', {
-          title: 'Inbox',
-          emails,
-          loggedIn: req.cookies.loggedIn,
-          userFullname: user[0].fullname,
-          prevPage,
-          nextPage,
-          pages,
-          page 
-      });
-  } catch (error) {
-      console.error(error);
-      res.clearCookie('loggedIn');
-      res.clearCookie('userId');
-      res.status(500).render('signin', { errorMessage: 'An error occurred, please login again.' });
-  }
-});
+    if (!req.cookies.loggedIn) {
+        return res.status(403).render('access_denied');
+    }
+  
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const offset = (page - 1) * limit;
+  
+    try {
+        // Truy vấn email từ cơ sở dữ liệu, bao gồm cả body và subject với COALESCE
+        const [emails] = await pool.query(
+            `SELECT e.id, 
+                    u.fullname AS sender, 
+                    COALESCE(e.subject, 'No subject') AS subject, 
+                    COALESCE(e.body, 'No body') AS body,
+                    e.created_at 
+             FROM emails e 
+             JOIN users u ON e.sender_id = u.id 
+             WHERE e.receiver_id = ? 
+             ORDER BY e.created_at DESC 
+             LIMIT ? OFFSET ?`, 
+            [req.cookies.userId, limit, offset]
+        );
+  
+        const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE receiver_id = ?', [req.cookies.userId]);
+        const totalPages = Math.ceil(totalEmails[0].count / limit);
+        const prevPage = page > 1 ? page - 1 : null;
+        const nextPage = page < totalPages ? page + 1 : null;
+  
+        const pages = Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+            const pageNum = i + 1 + Math.max(0, page - 3);
+            return pageNum <= totalPages && pageNum > 0 ? pageNum : null;
+        }).filter(num => num); 
+  
+        const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+  
+        if (!user || user.length === 0) {
+            res.clearCookie('loggedIn');
+            res.clearCookie('userId');
+            return res.status(404).render('signin', { errorMessage: 'User not found. Please login again.' });
+        }
+  
+        res.render('inbox', {
+            title: 'Inbox',
+            emails,
+            loggedIn: req.cookies.loggedIn,
+            userFullname: user[0].fullname,
+            prevPage,
+            nextPage,
+            pages,
+            page 
+        });
+    } catch (error) {
+        console.error(error);
+        res.clearCookie('loggedIn');
+        res.clearCookie('userId');
+        res.status(500).render('signin', { errorMessage: 'An error occurred, please login again.' });
+    }
+  });
 
 
 
@@ -146,90 +157,115 @@ router.get('/compose', async (req, res) => {
 
 
 router.get('/outbox', async (req, res) => {
-  if (!req.cookies.loggedIn) {
-      return res.status(403).render('access_denied');
-  }
+    if (!req.cookies.loggedIn) {
+        return res.status(403).render('access_denied');
+    }
 
-  const page = parseInt(req.query.page) || 1;
-  const limit = 5;
-  const offset = (page - 1) * limit;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const offset = (page - 1) * limit;
 
-  try {
-      const [emails] = await pool.query(
-          'SELECT e.id, u.fullname AS receiver, e.subject, e.created_at FROM emails e JOIN users u ON e.receiver_id = u.id WHERE e.sender_id = ? ORDER BY e.created_at DESC LIMIT ? OFFSET ?', 
-          [req.cookies.userId, limit, offset]
-      );
-      const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE sender_id = ?', [req.cookies.userId]);
-      const totalPages = Math.ceil(totalEmails[0].count / limit);
-      const prevPage = page > 1 ? page - 1 : null;
-      const nextPage = page < totalPages ? page + 1 : null;
+    try {
+        // Truy vấn email từ cơ sở dữ liệu, bao gồm cả body và subject với COALESCE
+        const [emails] = await pool.query(
+            `SELECT e.id, 
+                    u.fullname AS receiver, 
+                    COALESCE(e.subject, 'No subject') AS subject, 
+                    COALESCE(e.body, 'No body') AS body, 
+                    e.created_at 
+             FROM emails e 
+             JOIN users u ON e.receiver_id = u.id 
+             WHERE e.sender_id = ? 
+             ORDER BY e.created_at DESC 
+             LIMIT ? OFFSET ?`, 
+            [req.cookies.userId, limit, offset]
+        );
 
-      const pages = Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-          const pageNum = i + 1 + Math.max(0, page - 3);
-          return pageNum <= totalPages && pageNum > 0 ? pageNum : null;
-      }).filter(num => num); 
+        const [totalEmails] = await pool.query('SELECT COUNT(*) as count FROM emails WHERE sender_id = ?', [req.cookies.userId]);
+        const totalPages = Math.ceil(totalEmails[0].count / limit);
+        const prevPage = page > 1 ? page - 1 : null;
+        const nextPage = page < totalPages ? page + 1 : null;
 
-      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+        const pages = Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+            const pageNum = i + 1 + Math.max(0, page - 3);
+            return pageNum <= totalPages && pageNum > 0 ? pageNum : null;
+        }).filter(num => num); 
 
-      if (!user || user.length === 0) {
-          res.clearCookie('loggedIn');
-          res.clearCookie('userId');
-          return res.status(404).render('signin', { errorMessage: 'User not found. Please login again.' });
-      }
+        const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
 
-      res.render('outbox', {
-          title: 'Outbox',
-          emails,
-          loggedIn: req.cookies.loggedIn,
-          userFullname: user[0].fullname,
-          prevPage,
-          nextPage,
-          pages,
-          page 
-      });
-  } catch (error) {
-      console.error(error);
-      res.clearCookie('loggedIn');
-      res.clearCookie('userId');
-      res.status(500).render('signin', { errorMessage: 'An error occurred, please login again.' });
-  }
+        if (!user || user.length === 0) {
+            res.clearCookie('loggedIn');
+            res.clearCookie('userId');
+            return res.status(404).render('signin', { errorMessage: 'User not found. Please login again.' });
+        }
+
+        res.render('outbox', {
+            title: 'Outbox',
+            emails,
+            loggedIn: req.cookies.loggedIn,
+            userFullname: user[0].fullname,
+            prevPage,
+            nextPage,
+            pages,
+            page 
+        });
+    } catch (error) {
+        console.error(error);
+        res.clearCookie('loggedIn');
+        res.clearCookie('userId');
+        res.status(500).render('signin', { errorMessage: 'An error occurred, please login again.' });
+    }
 });
 
 
 router.get('/email/:id', async (req, res) => {
-  const emailId = req.params.id;
-
-  if (!req.cookies.loggedIn) {
-    return res.status(403).render('access_denied');
-  }
-
-  try {
-    const [emails] = await pool.query(
-      `SELECT emails.*, users.fullname AS sender_name 
-       FROM emails 
-       JOIN users ON emails.sender_id = users.id 
-       WHERE emails.id = ? AND (emails.receiver_id = ? OR emails.sender_id = ?)`,
-      [emailId, req.cookies.userId, req.cookies.userId]
-    );
-    if (emails.length === 0) {
-      return res.status(404).render('error', { message: 'Email not found or you do not have permission to view it.' });
+    const emailId = req.params.id;
+  
+    // Kiểm tra xem người dùng đã đăng nhập chưa
+    if (!req.cookies.loggedIn) {
+      return res.status(403).render('access_denied');
     }
-    const email = emails[0];
-    const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
-
-    if (!user || user.length === 0) {
-      return res.status(404).render('error', { message: 'User not found. Please login again.' });
+  
+    try {
+      // Thực hiện truy vấn để lấy thông tin email
+      const [emails] = await pool.query(
+        `SELECT emails.*, 
+                users.fullname AS sender_name, 
+                COALESCE(emails.body, 'no body') AS body, 
+                COALESCE(emails.subject, 'no subject') AS subject
+         FROM emails 
+         JOIN users ON emails.sender_id = users.id 
+         WHERE emails.id = ? AND (emails.receiver_id = ? OR emails.sender_id = ?)`,
+        [emailId, req.cookies.userId, req.cookies.userId]
+      );
+  
+      // Kiểm tra xem email có tồn tại không
+      if (emails.length === 0) {
+        return res.status(404).render('error', { message: 'Email not found or you do not have permission to view it.' });
+      }
+  
+      // Lấy email đầu tiên từ kết quả
+      const email = emails[0];
+  
+      // Lấy thông tin người dùng
+      const [user] = await pool.query('SELECT fullname FROM users WHERE id = ?', [req.cookies.userId]);
+  
+      // Kiểm tra xem người dùng có tồn tại không
+      if (!user || user.length === 0) {
+        return res.status(404).render('error', { message: 'User not found. Please login again.' });
+      }
+  
+      // Render trang chi tiết email
+      res.render('email_detail', { 
+        email,
+        userFullname: user[0].fullname,
+        loggedIn: req.cookies.loggedIn, 
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).render('error', { message: 'An error occurred, please try again later.' });
     }
-    res.render('email_detail', { 
-      email,
-      userFullname: user[0].fullname,
-      loggedIn: req.cookies.loggedIn, 
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).render('error', { message: 'An error occurred, please try again later.' });
-  }
-});
+  });
 
 
 

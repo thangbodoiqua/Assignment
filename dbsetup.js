@@ -2,7 +2,7 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-const pool = mysql.createPool({
+const pool =  mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -60,11 +60,12 @@ async function setupDatabase() {
     }
 }
 
-setupDatabase()
-    .then(() => {
-        console.log("Setup completed successfully!");
-    })
-    .catch((error) => console.error("Error setting up database:", error));
+if (require.main === module) {
+    setupDatabase()
+        .then(() => {
+            console.log("Setup completed successfully!");
+        })
+        .catch((error) => console.error("Error setting up database:", error));
+}
 
-module.exports = { pool };
-
+module.exports = { pool, setupDatabase };
