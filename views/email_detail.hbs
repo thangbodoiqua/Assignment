@@ -1,118 +1,30 @@
-<style>
-    .email-detail-container {
-        max-width: 800px;
-        margin: 100px auto;
-        padding: 40px;
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        color: #333;
-        font-family: 'Roboto', sans-serif;
-        line-height: 1.6;
-    }
 
-    .email-detail-container h2 {
-        font-size: 2.2em;
-        color: #004d99;
-        border-bottom: 3px solid #ffb400;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-        font-weight: 600;
-    }
-
-    .email-detail-container p {
-        font-size: 1.05em;
-        color: #555;
-        margin: 10px 0;
-    }
-
-    .email-detail-container p strong {
-        color: #004d99;
-    }
-
-    .email-body-title {
-        font-size: 1.3em;
-        font-weight: bold;
-        color: #333;
-        margin-top: 30px;
-        margin-bottom: 10px;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 5px;
-    }
-
-    .email-body {
-        font-size: 1.1em;
-        color: #444;
-        padding: 15px;
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .email-detail-container hr {
-        border: none;
-        height: 1px;
-        background-color: #ddd;
-        margin: 25px 0;
-    }
-
-    .email-detail-container a {
-        display: inline-block;
-        margin-top: 25px;
-        padding: 15px 30px;
-        background-color: #ffb400;
-        color: #333;
-        text-decoration: none;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-    .email-detail-container a:hover {
-        background-color: #e6a200;
-        transform: scale(1.05);
-    }
-
-    .email-attachment {
-        display: flex;
-        align-items: center;
-        margin-top: 10px;
-        margin-bottom: 20px;
-        padding: 10px;
-        background-color: #f2f2f2;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-    }
-
-    .email-attachment a {
-        margin-left: 10px;
-        color: #004d99;
-        font-weight: bold;
-        text-decoration: none;
-    }
-
-    .email-attachment a:hover {
-        text-decoration: underline;
-    }
-</style>
-
+<link rel="stylesheet" href="/css/email_detail.css">
 <div class="email-detail-container">
-    <h2>{{email.subject}}</h2>
-    <p><strong>From:</strong> {{email.sender_name}}</p>
-    <p><strong>Date:</strong> {{formatDate email.created_at}}</p>
-    <hr>
-    <p class="email-body-title">Email Content:</p>
-    <p class="email-body">{{email.body}}</p>
+        {{>sidebar}}
 
-    {{#if email.attachment}}
-    <div class="email-attachment">
-        <strong>Attachment:</strong>
-        <a href="/uploads/{{email.attachment}}" target="_blank">
-            <img src="../resources/img/attach_icon.png" alt="Attachment" style="width: 24px; height: 24px; vertical-align: middle;">
-            {{email.attachment}}
-        </a>
+    <div class="email-content">
+        <div class="email-header">
+            <h2>{{email.subject}}</h2>
+            <div class="email-meta">
+                <p><strong>From:</strong> {{email.sender_name}}</p>
+                <p><strong>Date:</strong> {{formatDate email.created_at}}</p>
+            </div>
+        </div>
+
+        <div class="email-body">
+            {{email.body}}
+        </div>
+
+        {{#if email.attachment}}
+        <div class="email-attachment">
+            <img src="../resources/img/attach_icon.png" alt="Attachment">
+            <a href="/uploads/{{email.attachment}}" target="_blank">
+                {{email.attachment}}
+            </a>
+        </div>
+        {{/if}}
+
+        <a href="/inbox" class="back-button">Back to Inbox</a>
     </div>
-    {{/if}}
-
-    <a href="/inbox">Back to Inbox</a>
 </div>

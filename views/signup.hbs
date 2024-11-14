@@ -1,178 +1,15 @@
-<!-- views/signup.hbs -->
-<style>
-   
+<link rel="stylesheet" href="/css/home.css">
 
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(
-                rgba(30, 30, 47, 0.8),
-                rgba(30, 30, 47, 0.8)
-            ),
-            linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-        color: #ffffff;
-        padding-top: 350px; /* Đảm bảo header không bị che */
-        box-sizing: border-box;
-    }
-
-    .signup-container {
-        display: flex;
-        width: 90%;
-        max-width: 900px;
-        background-color: rgba(255, 255, 255, 0.9);
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Phần giới thiệu */
-    .signup-welcome {
-        flex: 1;
-        padding: 40px;
-        background-color: #1e1e2f;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-    }
-
-    .signup-welcome h1 {
-        font-size: 2em;
-        margin-bottom: 20px;
-        color: #ffd700;
-    }
-
-    .signup-welcome p {
-        font-size: 1.1em;
-        color: #cfd8dc;
-    }
-
-    /* Phần form đăng ký */
-    .signup-form-container {
-        flex: 1;
-        padding: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    h2 {
-        text-align: center;
-        color: #1e1e2f;
-        margin-bottom: 20px;
-    }
-
-    .signup-form {
-        background-color: #ffffff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .signup-form div {
-        margin-bottom: 20px;
-    }
-
-    .signup-form label {
-        font-weight: bold;
-        color: #333;
-    }
-
-    .signup-form input[type="text"],
-    .signup-form input[type="email"],
-    .signup-form input[type="password"] {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        margin-top: 5px;
-        transition: border-color 0.3s ease;
-    }
-
-    .signup-form input[type="text"]:focus,
-    .signup-form input[type="email"]:focus,
-    .signup-form input[type="password"]:focus {
-        border-color: #ffd700;
-        outline: none;
-    }
-
-    .signup-form button {
-        width: 100%;
-        padding: 10px;
-        background-color: #ffd700;
-        color: #1e1e2f;
-        border: none;
-        border-radius: 20px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-    .signup-form button:hover {
-        background-color: #ffc107;
-        transform: scale(1.05);
-    }
-
-    .signup-form a {
-        display: block;
-        text-align: center;
-        color: #007bff;
-        text-decoration: none;
-        margin-top: 15px;
-        font-weight: bold;
-        transition: color 0.3s ease;
-    }
-
-    .signup-form a:hover {
-        color: #0056b3;
-    }
-
-    .error-message {
-        color: red;
-        text-align: center;
-    }
-
-    .success-message {
-        color: green;
-        text-align: center;
-    }
-
-    /* Responsive layout */
-    @media (max-width: 768px) {
-        .signup-container {
-            flex-direction: column;
-            max-width: 100%;
-        }
-
-        .signup-welcome {
-            padding: 20px;
-        }
-
-        .signup-form-container {
-            padding: 20px;
-        }
-    }
-</style>
-
-<div class="signup-container">
-    <!-- Phần giới thiệu ở bên trái -->
-    <div class="signup-welcome">
+<div class="auth-container">
+    <div class="auth-welcome">
         <h1>Create Your Account</h1>
-
     </div>
-
-    <!-- Phần form đăng ký ở bên phải -->
-    <div class="signup-form-container">
-        <h2>Sign Up</h2>
-        {{#if error}}
-            <p class="error-message">{{error}}</p>
+    <div class="auth-form-container">
+        <h1>Sign Up</h1>
+        {{#if errorMessage}}
+            <p class="error-message">{{errorMessage}}</p>
         {{/if}}
-        <form id="signupForm" class="signup-form" action="/register" method="POST">
+        <form id="signupForm" class="auth-form" action="/signup" method="POST">
             <div>
                 <label for="fullname">Full Name:</label>
                 <input type="text" id="fullname" name="fullname" value="{{fullname}}" placeholder="Enter your full name" required>
@@ -189,8 +26,8 @@
                 <label for="confirmPassword">Confirm Password:</label>
                 <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required>
             </div>
-            <button type="submit">Sign Up</button>
+            <button type="submit">SIGN UP</button>
         </form>
-        <span style="color: black;">Already have an account? <a href="/" style="text-decoration: underline; color: blue">Sign in</a></span>
+        <span>Already have an account? <a href="/">Sign in</a></span>
     </div>
 </div>

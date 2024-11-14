@@ -1,0 +1,30 @@
+.container {
+    background: #edf0f2;
+}
+
+.sidebar {
+    width: 20%;
+    padding: 24px;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    border-radius: 16px;
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 14px;
+    color: #ffffff;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar a:hover {
+opacity: 0.8;
+    transform: scale(1.05);
+}

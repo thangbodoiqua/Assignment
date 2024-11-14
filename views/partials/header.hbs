@@ -1,154 +1,18 @@
-{{!-- header.hbs --}}
-<style>
-    
-    .main-header {
-        position: fixed; 
-        top: 0;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #1E1E2F;
-        color: #ffffff;
-        padding: 15px 30px;
-        height: 70px; 
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transition: background-color 0.3s ease;
-        z-index: 1000; 
-    }
+<link rel="stylesheet" href="/css/head_foot.css">
 
-
-
-    
-    .main-header .logo a {
-        color: #FFD700;
-        font-size: 1.8em;
-        font-weight: bold;
-        text-transform: uppercase;
-        text-decoration: none;
-    }
-
-    
-    .main-header .header-actions {
-        display: flex;
-        align-items: center;
-    }
-
-    .main-header .header-actions .btn {
-        margin-left: 15px;
-        padding: 10px 20px;
-        color: #1E1E2F;
-        background-color: #FFD700;
-        border: none;
-        border-radius: 20px;
-        font-weight: bold;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-        white-space: nowrap;
-    }
-
-    .main-header .header-actions .btn:hover {
-        background-color: #FFC107;
-        transform: scale(1.1);
-    }
-
-    
-    @media (max-width: 768px) {
-        .main-header {
-            padding: 10px 20px;
-        }
-
-        
-        .main-header .logo a {
-    color: #FFD700;
-    font-size: 1.8em;
-    font-weight: bold;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: color 0.3s ease; 
-}
-
-
-        
-        .main-header .header-actions {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            background-color: #1E1E2F;
-            position: absolute;
-            top: 70px; 
-            right: 0;
-            width: 100%;
-            padding: 20px 0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        
-        .main-header.active .header-actions {
-            display: flex;
-        }
-
-        
-       .main-header .header-actions .btn {
-    margin-left: 15px;
-    padding: 10px 20px;
-    color: #1E1E2F;
-    background-color: #FFD700;
-    border: none;
-    border-radius: 20px;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.3s ease; 
-    white-space: nowrap;
-}
-.main-header .header-actions .btn:hover {
-    background-color: #FFC107; 
-}
-.main-header:hover {
-    background-color: #1E1E2F; 
-}
-
-        
-        .main-header .menu-icon {
-            display: inline-block;
-            cursor: pointer;
-        }
-
-        .menu-icon div {
-            width: 25px;
-            height: 3px;
-            background-color: #FFD700;
-            margin: 5px 0;
-            transition: all 0.3s ease;
-        }
-    }
-</style>
-
-<header class="main-header">
+<header>
     <div class="logo">
-        <a href="/">HANU EMAIL</a>
+        <a href="/">
+                <img src="/img/mail-svgrepo-com.svg" alt="HANU EMAIL Logo" class="logo-image">
+        </a>    
     </div>
-
-    
-    <div class="menu-icon" onclick="toggleMenu()">
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>
-
-    
     <div class="header-actions">
         {{#if loggedIn}}
             <span>Welcome, {{userFullname}}!</span>
-            <a href="/logout" class="btn">Sign Out</a>
+            <a href="/logout">Sign Out</a>
         {{else}}
             <a href="/" class="btn">Sign In</a>
-            <a href="/signup" class="btn">Sign Up</a>
+            <a href="/signup">Sign Up</a>
         {{/if}}
     </div>
 </header>
-
-<script>
-    function toggleMenu() {
-        const header = document.querySelector('.main-header');
-        header.classList.toggle('active');
-    }
-</script>

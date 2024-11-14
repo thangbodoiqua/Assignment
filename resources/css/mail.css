@@ -1,0 +1,187 @@
+/* compos */
+
+
+.mail-container {
+    display: flex;
+    margin-top: 80px;
+    padding: 20px;
+    background: #edf0f2;
+    gap: 24px;
+}
+
+
+.mail-content {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    overflow: hidden;
+}
+
+.mail-content h2 {
+    color: #1e3c72;
+    font-size: 2em;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #c8cdd2;
+}
+
+.select-all-container {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.select-all-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    cursor: pointer;
+}
+
+.delete-button {
+    background: #ff8e8e;
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-left: auto;
+    transition: all 0.3s ease;
+}
+
+.delete-button:hover {
+background: #ff6b6b;
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+
+.email-item {
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.email-item:hover {
+    transform: translateY(-2px);
+    border-color: #1e3c72;
+}
+
+.email-item a {
+    flex: 1;
+}
+
+.email-item h3 {
+    color: #1e3c72;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+}
+
+.email-item p {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin: 0;
+}
+
+.email-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e9ecef;
+}
+
+.pagination a {
+    padding: 10px 16px;
+    border: 2px solid #1e3c72;
+    color: #1e3c72;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.pagination a:hover,
+.pagination a.active {
+    background: #1e3c72;
+    color: #ffffff;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: #1e3c72;
+    margin-bottom: 10px;
+}
+
+.form-control {
+    width: 95%;
+    padding: 14px;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-size: 1em;
+}
+
+.form-control:focus {
+    border-color: #1e3c72;
+    box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.1);
+    outline: none;
+}
+
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.mail-content form button {
+    width: 150px;
+    padding: 12px 24px;
+    background: #2a5298;
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 24px auto;
+    overflow: hidden;
+}
+
+.mail-content form button:hover {
+    transform: scale(1.05);
+opacity: 0.8;
+}
+
+.mail-content form button:active {
+    transform: scale(1.05);
+opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+
+}
